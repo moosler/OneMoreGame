@@ -6,6 +6,7 @@ import { JokerRow } from "./jokerRow";
 import { PointsCol } from "./pointsCol";
 import { DiceField } from "./diceField";
 import { Button } from "./button";
+import { Player } from "./player";
 
 /**
  * @todo use hex Colors
@@ -39,11 +40,27 @@ export class Game {
   diceField: DiceField;
   diceButton: Button;
   nextButton: Button;
+  players: Player[];
+  currentPlayer: number;
+  playerStat: Phaser.GameObjects.Text;
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.marginLeft = 50;
     this.marginTop = 50;
     this.grid = new Grid(this.scene, this.marginLeft, this.marginTop + 50);
+    this.players = [new Player("One"), new Player("Two")];
+    this.currentPlayer = 0;
+    /**@todo move to UI Components */
+    
+    this.playerStat =  this.scene.add.text(
+      this.scene.sys.game.canvas.width*.5-25*6,
+      0,
+      String("Player One´s turn:"),
+      {
+        font: "25px Arial Black",
+        color: "#aaa"
+      }
+    );
     this.topRow = new TopRow(this.scene, this.marginLeft, this.marginTop, this.grid.cols);
     this.pointsRow = new PointsRow(
       this.scene,
@@ -75,12 +92,22 @@ export class Game {
     this.nextButton = new Button(this.marginLeft + 400, 580, "=>", this.scene, () =>
       console.log("next round")
     );
+    
     this.init();
   }
   init() {
     this.grid.setStartCol();
-    this.grid.setContiguousCell(this.grid.grid[7][3]);
-    let colors = this.diceField.getDiceColors();
-    console.log(colors);
+
+    this.grid.calcContiguousRegions(this.topRow.elements[0]);
+    // this.grid.setContiguousCell(this.grid.grid[7][3]);
+    // this.grid.highlightCells(this.grid.coherentCells);
+    // console.log(this.grid.coherentCells);
+    // let colors = this.diceField.getDiceColors();
+    // for (let i = 0; i < colors.length; i++) {
+    //   const element = colors[i];
+      
+    // }
+    
+    // console.log(colors);
   }
 }

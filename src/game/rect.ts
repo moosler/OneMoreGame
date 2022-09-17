@@ -1,4 +1,18 @@
 import Phaser from "phaser";
+import { styleDefaultRect } from "./game";
+/**
+ * @todo set Color Style here
+ */
+
+let pointOverSytle = {
+  strokeColor: 0xefc53f,
+  strokWeigth: 4
+}
+
+let hightlightStyle = {
+  strokeColor: 0xc3c3c3,
+  strokWeigth: 4,
+};
 
 export class Rect {
   rectSize: number;
@@ -19,6 +33,7 @@ export class Rect {
   textObject: Phaser.GameObjects.Text | undefined;
   pos: { x: number; y: number };
   marked: boolean;
+  highlight: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -41,6 +56,7 @@ export class Rect {
     this.pos = pos;
     this.isInteractive = isInteractive;
     this.marked = false;
+    this.highlight =false;
     if (isMid) {
       this.style.strokeColor = this.style.strokeColorStart;
     }
@@ -62,10 +78,10 @@ export class Rect {
     if (this.isInteractive) {
       this.gameObject.setInteractive();
       this.gameObject.on("pointerover", () => {
-        this.setStroke(0xefc53f, 4);
+        this.setStroke(pointOverSytle.strokeColor, pointOverSytle.strokWeigth);
       });
       this.gameObject.on("pointerout", () => {
-        this.setStroke(this.style.strokeColor, 2);
+        this.setStroke(this.style.strokeColor, this.style.strokWeigth);
       });
       this.gameObject.on("pointerdown", () => {
         this.text = "X";
@@ -109,5 +125,11 @@ export class Rect {
    */
   setMark(marked = true) {
     this.marked = marked;
+  }
+  hightlightCell(){
+    this.highlight = true;
+    this.setStroke(hightlightStyle.strokeColor, hightlightStyle.strokWeigth);
+    this.style.strokeColor = hightlightStyle.strokeColor;
+    this.style.strokWeigth = hightlightStyle.strokWeigth;
   }
 }

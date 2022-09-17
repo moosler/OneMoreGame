@@ -64,7 +64,11 @@ export class DiceField {
     for (let i = mid; i < this.dices.length; i++) {
       const element = this.dices[i];
       let col = element.getColor();
-      if (col == "#111111") return diceColors;
+      if (col == "#111111") {
+        let nArr = [...diceColors];
+        nArr.pop();
+        return nArr;
+      }
       colAr.push(col);
     }
     let unique = colAr.filter(function onlyUnique(value, index, self) {
