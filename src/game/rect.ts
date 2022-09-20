@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { gameInstance } from "../scenes/Game";
 import { styleDefaultRect } from "./game";
 /**
  * @todo set Color Style here
@@ -6,8 +7,8 @@ import { styleDefaultRect } from "./game";
 
 let pointOverSytle = {
   strokeColor: 0xefc53f,
-  strokWeigth: 4
-}
+  strokWeigth: 4,
+};
 
 let hightlightStyle = {
   strokeColor: 0xc3c3c3,
@@ -34,6 +35,8 @@ export class Rect {
   pos: { x: number; y: number };
   marked: boolean;
   highlight: boolean;
+  regionIndex: number | null;
+  isStar: undefined | boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -56,7 +59,9 @@ export class Rect {
     this.pos = pos;
     this.isInteractive = isInteractive;
     this.marked = false;
-    this.highlight =false;
+    this.highlight = false;
+    this.regionIndex = null;
+    this.isStar = undefined;
     if (isMid) {
       this.style.strokeColor = this.style.strokeColorStart;
     }
@@ -73,7 +78,10 @@ export class Rect {
     this.init();
   }
   init() {
-    this.gameObject.setStrokeStyle(this.style.strokWeigth, this.style.strokeColor);
+    this.gameObject.setStrokeStyle(
+      this.style.strokWeigth,
+      this.style.strokeColor
+    );
 
     if (this.isInteractive) {
       this.gameObject.setInteractive();
@@ -84,8 +92,11 @@ export class Rect {
         this.setStroke(this.style.strokeColor, this.style.strokWeigth);
       });
       this.gameObject.on("pointerdown", () => {
-        this.text = "X";
-        this.showText();
+        if (this.text !== "X") {
+          this.text = "X";
+          this.showText();
+          gameInstance.currentPlayer.setMark(this);
+        }
       });
     }
     if (this.text !== "") {
@@ -126,10 +137,15 @@ export class Rect {
   setMark(marked = true) {
     this.marked = marked;
   }
-  hightlightCell(){
+  hightlightCell() {
     this.highlight = true;
     this.setStroke(hightlightStyle.strokeColor, hightlightStyle.strokWeigth);
     this.style.strokeColor = hightlightStyle.strokeColor;
     this.style.strokWeigth = hightlightStyle.strokWeigth;
+  }
+  setStar() {
+    this.isStar = true;
+    this.text = "★";
+    this.showText();
   }
 }

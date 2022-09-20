@@ -69,7 +69,12 @@ export class Grid {
         this.group.add(this.grid[i][j].gameObject, true);
       }
     }
+    this.setStartCol();
+    this.setStars();
+    this.calcContiguousRegions();
+    console.log(this.regions);
   }
+
   /**
    * makes sure that all colors appear at least once in the middle column
    */
@@ -92,6 +97,27 @@ export class Grid {
     for (let j = 0; j < this.grid[0].length; j++) {
       this.grid[mid][j].setColor(rowArr[j]);
     }
+  }
+  setStars() {
+    for (const key in rectColors) {
+      if (Object.prototype.hasOwnProperty.call(rectColors, key)) {
+        const element = rectColors[key];
+        const color = new Phaser.Display.Color(element.r, element.g, element.b);
+        this.setStar(color);
+      }
+    }
+  }
+  setStar(color: Phaser.Display.Color) {
+    let cell =
+      this.grid[Math.floor(Math.random() * this.cols)][
+        Math.floor(Math.random() * this.rows)
+      ];
+    while (cell.style.color !== color.color) {
+      let randX = Math.floor(Math.random() * this.cols);
+      let randY = Math.floor(Math.random() * this.rows);
+      cell = this.grid[randX][randY];
+    }
+    cell.setStar();
   }
 
   /**
@@ -201,7 +227,7 @@ export class Grid {
    * calcs all contiguous Regions of a Color and stores it in the regions array
    * in eacht cell the reference to the region is set
    */
-  calcContiguousRegions(startCell: Rect) {
+  calcContiguousRegions() {
     for (let i = 0; i < this.cols; i++) {
       for (let j = 0; j < this.rows; j++) {
         let cell = this.grid[i][j];
@@ -212,6 +238,18 @@ export class Grid {
         }
       }
     }
-    console.log(this.regions);
+    this.setRegionIndex();
+  }
+  /**
+   * sets the region Index for each Cell
+   */
+  setRegionIndex() {
+    for (let i = 0; i < this.regions.length; i++) {
+      const regions = this.regions[i];
+      for (let j = 0; j < regions.length; j++) {
+        const cell = regions[j];
+        cell.regionIndex = i;
+      }
+    }
   }
 }

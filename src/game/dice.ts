@@ -13,7 +13,14 @@ let textStyle = {
 };
 
 let diceValues = [1, 2, 3, 4, 5, "?"];
-export const diceColors = ["#62b1db", "#c66a8d", "#ae7749", "#c8b47f", "#58853e", "#111111"];
+export const diceColors = [
+  "#62b1db",
+  "#c66a8d",
+  "#ae7749",
+  "#c8b47f",
+  "#58853e",
+  "#111111",
+];
 
 export class Dice {
   rectSize: number;
@@ -26,14 +33,24 @@ export class Dice {
   type: string;
   color: string | undefined;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, rectSize: number, type: string = "val") {
+  constructor(
+    scene: Phaser.Scene,
+    x: number,
+    y: number,
+    rectSize: number,
+    type: string = "val"
+  ) {
     this.x = x;
     this.y = y;
     this.rectSize = rectSize;
     this.type = type;
-    this.text = String(diceValues[Math.floor(Math.random() * diceValues.length)]);
+    this.text = String(
+      diceValues[Math.floor(Math.random() * diceValues.length)]
+    );
     if (this.type !== "val") {
-      this.text = String(diceColors[Math.floor(Math.random() * diceColors.length)]);
+      this.text = String(
+        diceColors[Math.floor(Math.random() * diceColors.length)]
+      );
     }
     this.color;
     this.scene = scene;

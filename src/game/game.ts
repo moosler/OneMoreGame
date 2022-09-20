@@ -40,28 +40,37 @@ export class Game {
   diceField: DiceField;
   diceButton: Button;
   nextButton: Button;
-  players: Player[];
-  currentPlayer: number;
+  players: Player[] | any;
   playerStat: Phaser.GameObjects.Text;
+  currentPlayer: Player;
+  turn: number;
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.marginLeft = 50;
     this.marginTop = 50;
     this.grid = new Grid(this.scene, this.marginLeft, this.marginTop + 50);
-    this.players = [new Player("One"), new Player("Two")];
-    this.currentPlayer = 0;
+    this.players = [new Player("One", 1), new Player("Two", 2)];
+    this.currentPlayer = this.players[0];
+    this.turn = 1;
     /**@todo move to UI Components */
-    
-    this.playerStat =  this.scene.add.text(
-      this.scene.sys.game.canvas.width*.5-25*6,
+
+    this.playerStat = this.scene.add.text(
+      this.scene.sys.game.canvas.width * 0.5,
       0,
-      String("Player One´s turn:"),
+      String(""),
       {
         font: "25px Arial Black",
-        color: "#aaa"
+        color: "#aaa",
       }
     );
-    this.topRow = new TopRow(this.scene, this.marginLeft, this.marginTop, this.grid.cols);
+    this.playerStat.x -= this.playerStat.width * 0.5;
+
+    this.topRow = new TopRow(
+      this.scene,
+      this.marginLeft,
+      this.marginTop,
+      this.grid.cols
+    );
     this.pointsRow = new PointsRow(
       this.scene,
       this.marginLeft,
@@ -86,28 +95,50 @@ export class Game {
       this.marginTop + 3 * 50 + this.grid.rectSize * (this.grid.rows + 1),
       this.grid.rectSize
     );
-    this.diceButton = new Button(this.marginLeft + 100, 580, "Start Game", this.scene, () =>
-      console.log("game is started")
+    this.diceButton = new Button(
+      this.marginLeft + 100,
+      580,
+      "Start Game",
+      this.scene,
+      () => console.log("game is started")
     );
-    this.nextButton = new Button(this.marginLeft + 400, 580, "=>", this.scene, () =>
-      console.log("next round")
+    this.nextButton = new Button(
+      this.marginLeft + 400,
+      580,
+      "=> " + this.turn + "." + this.currentPlayer.index,
+      this.scene,
+      () => {
+        console.log("next round");
+        this.nextStep();
+      }
     );
-    
+
     this.init();
   }
   init() {
-    this.grid.setStartCol();
-
-    this.grid.calcContiguousRegions(this.topRow.elements[0]);
-    // this.grid.setContiguousCell(this.grid.grid[7][3]);
-    // this.grid.highlightCells(this.grid.coherentCells);
-    // console.log(this.grid.coherentCells);
-    // let colors = this.diceField.getDiceColors();
-    // for (let i = 0; i < colors.length; i++) {
-    //   const element = colors[i];
-      
-    // }
-    
-    // console.log(colors);
+    this.setPlayer();
+  }
+  nextStep() {
+    this.nextPlayer();
+  }
+  rotatePlayerArray() {
+    let first = this.players.shift();
+    this.players.push(first);
+  }
+  nextPlayer() {
+    let index = this.currentPlayer.index; //index starts at one
+    let nextIndex = index % this.players.length;
+    if (nextIndex - 1 > index) {
+      this.rotatePlayerArray();
+      this.turn++;
+    }
+    this.currentPlayer = this.players[nextIndex];
+    this.setPlayer();
+  }
+  setPlayer() {
+    let player = this.currentPlayer;
+    this.playerStat.text = "" + player.name + "´s (" + player.index + ") turn:";
+    this.playerStat.x =
+      this.scene.sys.game.canvas.width * 0.5 - this.playerStat.width * 0.5;
   }
 }

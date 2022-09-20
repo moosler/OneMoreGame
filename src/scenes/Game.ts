@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import { Game } from "../game/game";
 
+export let gameInstance: Game;
+
 export default class Demo extends Phaser.Scene {
   constructor() {
     super("GameScene");
@@ -11,6 +13,6 @@ export default class Demo extends Phaser.Scene {
   }
 
   create() {
-    let game = new Game(this);
+    gameInstance = new Game(this);
   }
 }
