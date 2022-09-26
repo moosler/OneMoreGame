@@ -31,12 +31,13 @@ export class Rect {
   gameObject: Phaser.GameObjects.Rectangle;
   text: string;
   isInteractive: boolean;
-  textObject: Phaser.GameObjects.Text | undefined;
+  textObject: Phaser.GameObjects.Text;
   pos: { x: number; y: number };
   marked: boolean;
   highlight: boolean;
   regionIndex: number | null;
   isStar: undefined | boolean;
+  starObject: Phaser.GameObjects.Text | undefined;
 
   constructor(
     scene: Phaser.Scene,
@@ -73,7 +74,13 @@ export class Rect {
       this.rectSize,
       this.style.color
     );
-    this.textObject;
+    this.textObject = this.scene.add.text(
+      this.x - this.rectSize * 0.5,
+      this.y - this.rectSize * 0.5,
+      this.text,
+      this.getStyle()
+    );
+    this.starObject = undefined;
 
     this.init();
   }
@@ -82,7 +89,6 @@ export class Rect {
       this.style.strokWeigth,
       this.style.strokeColor
     );
-
     if (this.isInteractive) {
       this.gameObject.setInteractive();
       this.gameObject.on("pointerover", () => {
@@ -92,37 +98,38 @@ export class Rect {
         this.setStroke(this.style.strokeColor, this.style.strokWeigth);
       });
       this.gameObject.on("pointerdown", () => {
-        if (this.text !== "X") {
-          this.text = "X";
-          this.showText();
-          gameInstance.currentPlayer.setMark(this);
-        }
+        gameInstance.currentPlayer.setMark(
+          this,
+          gameInstance.grid.getNeighbors(this, false, false)
+        );
+        this.setText("X");
+        this.setMark();
       });
     }
     if (this.text !== "") {
-      this.showText();
+      this.setText(this.text);
     }
   }
-  showText() {
+  setText(text: string) {
+    this.textObject.text = text;
+    this.text = text;
+    this.setStyle(this.textObject);
+    Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
+  }
+  setStyle(obj: Phaser.GameObjects.Text, depth = 1) {
+    obj.setStroke("#111", 6);
+    obj.setShadow(2, 2, "#333333", 2, true, true);
+    obj.setDepth(depth);
+  }
+  getStyle(fontMultiplier = 1) {
     let fill = "#879eb4";
     if (this.isMid) {
       fill = "#974c75";
     }
-    let textStyle = {
-      font: this.rectSize * 0.5 + "px Arial Black",
+    return {
+      font: this.rectSize * 0.5 * fontMultiplier + "px Arial Black",
       fill: fill,
     };
-    this.textObject = this.scene.add.text(
-      this.x - this.rectSize * 0.5,
-      this.y - this.rectSize * 0.5,
-      this.text,
-      textStyle
-    );
-    this.textObject.setStroke("#111", 6);
-    this.textObject.setShadow(2, 2, "#333333", 2, true, true);
-    this.textObject.setDepth(1);
-
-    Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
   }
   setColor(colorObj: number) {
     this.gameObject.fillColor = colorObj;
@@ -145,7 +152,13 @@ export class Rect {
   }
   setStar() {
     this.isStar = true;
-    this.text = "★";
-    this.showText();
+    this.starObject = this.scene.add.text(
+      this.x - this.rectSize * 0.5,
+      this.y - this.rectSize * 0.5,
+      "★",
+      this.getStyle(1.75)
+    );
+    this.setStyle(this.starObject, 0);
+    Phaser.Display.Align.In.Center(this.starObject, this.gameObject);
   }
 }

@@ -32,6 +32,7 @@ export class Dice {
   text: string;
   type: string;
   color: string | undefined;
+  textObject: any;
 
   constructor(
     scene: Phaser.Scene,
@@ -44,16 +45,15 @@ export class Dice {
     this.y = y;
     this.rectSize = rectSize;
     this.type = type;
-    this.text = String(
-      diceValues[Math.floor(Math.random() * diceValues.length)]
-    );
-    if (this.type !== "val") {
-      this.text = String(
-        diceColors[Math.floor(Math.random() * diceColors.length)]
-      );
-    }
+    this.text = this.getNewDiceValue();
     this.color;
     this.scene = scene;
+    this.textObject = this.scene.add.text(
+      this.x - this.rectSize * 0.5,
+      this.y - this.rectSize * 0.5,
+      this.text,
+      this.getStyle()
+    );
     this.gameObject = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.x,
@@ -67,34 +67,48 @@ export class Dice {
   init() {
     this.gameObject.setStrokeStyle(style.strokWeigth, style.strokeColor);
     this.gameObject.setDepth(1);
-
-    if (this.text !== "") {
-      let fill = textStyle.fill;
-      if (this.type !== "val") {
-        fill = this.text;
-        this.text = "+";
-      }
-      this.color = fill;
-      let textSty = {
-        font: this.rectSize * 0.5 + "px Arial Black",
-        fill: fill,
-      };
-
-      const text = this.scene.add.text(
-        this.x - this.rectSize * 0.5,
-        this.y - this.rectSize * 0.5,
-        this.text,
-        textSty
-      );
-
-      text.setStroke(textStyle.stroke, textStyle.strokeWeight);
-      text.setShadow(2, 2, textStyle.shadow, 2, true, true);
-      text.setDepth(2);
-
-      Phaser.Display.Align.In.Center(text, this.gameObject);
+    this.drawDice();
+    Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
+  }
+  drawDice() {
+    let fill = textStyle.fill;
+    this.textObject.text = this.text;
+    if (this.type !== "val") {
+      this.text = "+";
+      this.textObject.text = "+";
+      this.textObject.setColor(this.text); // @todo
     }
+    this.color = fill;
+    this.textObject.setStroke(textStyle.stroke, textStyle.strokeWeight);
+    this.textObject.setShadow(2, 2, textStyle.shadow, 2, true, true);
+    this.textObject.setDepth(2);
+  }
+  getStyle() {
+    let fill = textStyle.fill;
+    if (this.type !== "val") {
+      fill = this.text;
+    }
+    let textSty = {
+      font: this.rectSize * 0.5 + "px Arial Black",
+      fill: fill,
+    };
+    return textSty;
   }
   getColor() {
     return this.color;
+  }
+  getNewDiceValue() {
+    let dice = String(
+      diceValues[Math.floor(Math.random() * diceValues.length)]
+    );
+    if (this.type !== "val") {
+      dice = String(diceColors[Math.floor(Math.random() * diceColors.length)]);
+    }
+    return dice;
+  }
+  setNewDiceValue() {
+    let val = this.getNewDiceValue();
+    this.text = val;
+    this.drawDice();
   }
 }

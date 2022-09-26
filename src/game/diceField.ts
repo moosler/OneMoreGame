@@ -76,4 +76,10 @@ export class DiceField {
     });
     return unique;
   }
+  shuffleDices() {
+    for (let i = 0; i < this.dices.length; i++) {
+      const dice = this.dices[i];
+      dice.setNewDiceValue();
+    }
+  }
 }

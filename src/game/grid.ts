@@ -72,7 +72,7 @@ export class Grid {
     this.setStartCol();
     this.setStars();
     this.calcContiguousRegions();
-    console.log(this.regions);
+    // console.log(this.regions);
   }
 
   /**
@@ -120,6 +120,36 @@ export class Grid {
     cell.setStar();
   }
 
+  calcReachableRegion() {
+    let regions = [];
+    let mid = Math.floor(this.cols / 2);
+
+    for (let i = 0; i < this.rows; i++) {
+      regions.push({ x: mid, y: i });
+    }
+    return regions;
+  }
+
+  drawCells(region: { x: number; y: number }[]) {
+    this.redrawRegion(region);
+  }
+  redrawRegion(region: { x: number; y: number }[]) {
+    for (let i = 0; i < region.length; i++) {
+      const element = region[i];
+      const cell = this.grid[element.x][element.y];
+      cell.setText("X");
+    }
+  }
+  resetCells() {
+    for (let i = 0; i < this.cols; i++) {
+      for (let j = 0; j < this.rows; j++) {
+        let cell = this.grid[i][j];
+        cell.setMark(false);
+        cell.setText("");
+      }
+    }
+  }
+
   /**
    * returns all contiguous cells of one color
    * @param cell
@@ -153,8 +183,8 @@ export class Grid {
 
   markCells(cells: Rect[], mark: boolean = true) {
     for (let i = 0; i < cells.length; i++) {
-      const element = cells[i];
-      element.setMark(mark);
+      const cell = cells[i];
+      cell.setMark(mark);
     }
   }
   /**

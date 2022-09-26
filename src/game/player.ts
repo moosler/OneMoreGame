@@ -5,32 +5,30 @@ export class Player {
   markedRegion: { x: number; y: number }[];
   index: number;
 
-  constructor(name: String, index: number) {
+  constructor(
+    name: String,
+    index: number,
+    reachableRegion: { x: number; y: number }[]
+  ) {
     this.name = name;
     this.index = index;
-    /**
-     * @todo calc initial Region
-     */
-    this.reachableRegion = [
-      { x: 7, y: 0 },
-      { x: 7, y: 1 },
-      { x: 7, y: 2 },
-      { x: 7, y: 3 },
-      { x: 7, y: 4 },
-      { x: 7, y: 5 },
-      { x: 7, y: 6 },
-      { x: 7, y: 6 },
-    ];
+    this.reachableRegion = reachableRegion;
     this.markedRegion = [];
     this.init();
   }
   init() {}
-  setMark(cell: Rect) {
+  setMark(cell: Rect, neighbors: Rect[]) {
     let obj = { x: cell.pos.x, y: cell.pos.y };
     //add cell to markedRegion
     this.addToArrayIfNotExist(obj, this.markedRegion);
     //add cell to reachableRegion
     this.addToArrayIfNotExist(obj, this.reachableRegion);
+    //add all Neighbors to reachableRegion
+    for (let i = 0; i < neighbors.length; i++) {
+      const neighbor = neighbors[i];
+      const obj = { x: neighbor.pos.x, y: neighbor.pos.y };
+      this.addToArrayIfNotExist(obj, this.reachableRegion);
+    }
   }
   addToArrayIfNotExist(obj: { x: any; y: any }, arr: any[]) {
     const index = arr.findIndex(
@@ -39,5 +37,10 @@ export class Player {
     if (index === -1) {
       arr.push(obj);
     }
+  }
+  calcMovePosibilites() {
+    //this.reachableRegion not marked
+    //this.reachableRegion for each dice Color
+    //this.reachableRegion for each dice Value
   }
 }

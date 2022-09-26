@@ -44,14 +44,20 @@ export class Game {
   playerStat: Phaser.GameObjects.Text;
   currentPlayer: Player;
   turn: number;
+  tickPerTurn: number;
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.marginLeft = 50;
     this.marginTop = 50;
     this.grid = new Grid(this.scene, this.marginLeft, this.marginTop + 50);
-    this.players = [new Player("One", 1), new Player("Two", 2)];
+    this.players = [
+      new Player("One", 0, this.grid.calcReachableRegion()),
+      new Player("Two", 1, this.grid.calcReachableRegion()),
+      new Player("Hans", 2, this.grid.calcReachableRegion()),
+    ];
     this.currentPlayer = this.players[0];
     this.turn = 1;
+    this.tickPerTurn = 0;
     /**@todo move to UI Components */
 
     this.playerStat = this.scene.add.text(
@@ -120,25 +126,35 @@ export class Game {
   }
   nextStep() {
     this.nextPlayer();
+    this.diceField.shuffleDices();
+    this.grid.resetCells();
+    this.grid.drawCells(this.currentPlayer.markedRegion);
   }
   rotatePlayerArray() {
     let first = this.players.shift();
     this.players.push(first);
   }
   nextPlayer() {
-    let index = this.currentPlayer.index; //index starts at one
-    let nextIndex = index % this.players.length;
-    if (nextIndex - 1 > index) {
+    let nextIndex = this.tickPerTurn + 1;
+    if (this.tickPerTurn === this.players.length - 1) {
       this.rotatePlayerArray();
-      this.turn++;
+      this.turn = this.turn + 1;
+      nextIndex = 0;
+      this.tickPerTurn = -1;
     }
+    this.tickPerTurn++;
     this.currentPlayer = this.players[nextIndex];
     this.setPlayer();
   }
   setPlayer() {
     let player = this.currentPlayer;
-    this.playerStat.text = "" + player.name + "´s (" + player.index + ") turn:";
+    this.playerStat.text =
+      "" + player.name + "´s (" + (player.index + 1) + ") turn:";
     this.playerStat.x =
       this.scene.sys.game.canvas.width * 0.5 - this.playerStat.width * 0.5;
+
+    this.nextButton.setText(
+      "=> " + this.turn + "." + (this.currentPlayer.index + 1)
+    );
   }
 }
