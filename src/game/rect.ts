@@ -35,7 +35,7 @@ export class Rect {
   pos: { x: number; y: number };
   marked: boolean;
   highlight: boolean;
-  regionIndex: number | null;
+  regionIndex: number;
   isStar: undefined | boolean;
   starObject: Phaser.GameObjects.Text | undefined;
 
@@ -61,7 +61,7 @@ export class Rect {
     this.isInteractive = isInteractive;
     this.marked = false;
     this.highlight = false;
-    this.regionIndex = null;
+    this.regionIndex = -1;
     this.isStar = undefined;
     if (isMid) {
       this.style.strokeColor = this.style.strokeColorStart;
@@ -160,5 +160,11 @@ export class Rect {
     );
     this.setStyle(this.starObject, 0);
     Phaser.Display.Align.In.Center(this.starObject, this.gameObject);
+  }
+  getRegionIndex(): number {
+    return this.regionIndex;
+  }
+  getColor() {
+    return this.style.color;
   }
 }

@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Dice, diceColors } from "./dice";
+import { Dice, diceColors, diceValues } from "./dice";
 
 let style = {
   color: 0xaaaaaa,
@@ -58,18 +58,40 @@ export class DiceField {
       x += this.rectSize;
     }
   }
+  getDiceValues() {
+    let colAr = [];
+    let mid = 3;
+    for (let i = 0; i < mid; i++) {
+      const element = this.dices[i];
+      if (element.isUsed === false) {
+        let val = element.getValue();
+        if (val == "?") {
+          let nArr = [...diceValues];
+          nArr.pop();
+          return nArr;
+        }
+        colAr.push(val);
+      }
+    }
+    let unique = colAr.filter(function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index;
+    });
+    return unique;
+  }
   getDiceColors() {
     let colAr = [];
     let mid = 3;
     for (let i = mid; i < this.dices.length; i++) {
       const element = this.dices[i];
-      let col = element.getColor();
-      if (col == "#111111") {
-        let nArr = [...diceColors];
-        nArr.pop();
-        return nArr;
+      if (element.isUsed === false) {
+        let col = element.getColor();
+        if (col == "#111111") {
+          let nArr = [...diceColors];
+          nArr.pop();
+          return nArr;
+        }
+        colAr.push(col);
       }
-      colAr.push(col);
     }
     let unique = colAr.filter(function onlyUnique(value, index, self) {
       return self.indexOf(value) === index;

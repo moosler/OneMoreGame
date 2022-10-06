@@ -12,7 +12,7 @@ let textStyle = {
   shadow: "#333333",
 };
 
-let diceValues = [1, 2, 3, 4, 5, "?"];
+export const diceValues = [1, 2, 3, 4, 5, "?"];
 export const diceColors = [
   "#62b1db",
   "#c66a8d",
@@ -33,6 +33,7 @@ export class Dice {
   type: string;
   color: string | undefined;
   textObject: any;
+  isUsed: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -48,6 +49,7 @@ export class Dice {
     this.text = this.getNewDiceValue();
     this.color;
     this.scene = scene;
+    this.isUsed = false; //marks if a player has selected this dice
     this.textObject = this.scene.add.text(
       this.x - this.rectSize * 0.5,
       this.y - this.rectSize * 0.5,
@@ -73,12 +75,14 @@ export class Dice {
   drawDice() {
     let fill = textStyle.fill;
     this.textObject.text = this.text;
+    this.color = fill;
     if (this.type !== "val") {
+      this.color = this.text;
       this.text = "+";
       this.textObject.text = "+";
-      this.textObject.setColor(this.text); // @todo
+      this.textObject.setColor(this.color);
+      this.textObject.setFontStyle(this.rectSize * 0.75 + "px");
     }
-    this.color = fill;
     this.textObject.setStroke(textStyle.stroke, textStyle.strokeWeight);
     this.textObject.setShadow(2, 2, textStyle.shadow, 2, true, true);
     this.textObject.setDepth(2);
@@ -96,6 +100,9 @@ export class Dice {
   }
   getColor() {
     return this.color;
+  }
+  getValue() {
+    return this.text;
   }
   getNewDiceValue() {
     let dice = String(

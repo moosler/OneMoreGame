@@ -140,12 +140,14 @@ export class Grid {
       cell.setText("X");
     }
   }
-  resetCells() {
+  resetCells(text: boolean = true) {
     for (let i = 0; i < this.cols; i++) {
       for (let j = 0; j < this.rows; j++) {
         let cell = this.grid[i][j];
         cell.setMark(false);
-        cell.setText("");
+        if (text) {
+          cell.setText("");
+        }
       }
     }
   }
@@ -153,7 +155,6 @@ export class Grid {
   /**
    * returns all contiguous cells of one color
    * @param cell
-   * @returns array of all contiguous cells
    */
   setContiguousCell(cell: Rect) {
     this.markCells(this.coherentCells, false); //reset current marking
@@ -165,7 +166,6 @@ export class Grid {
    * determine contiguous colored regions in a grid?
    * depth first search
    * @param cell
-   * @returns
    */
   visit(cell: Rect) {
     if (cell.marked) return;
@@ -281,5 +281,8 @@ export class Grid {
         cell.regionIndex = i;
       }
     }
+  }
+  getRegion(index: number) {
+    return this.regions[index];
   }
 }

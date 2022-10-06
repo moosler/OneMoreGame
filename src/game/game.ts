@@ -123,6 +123,7 @@ export class Game {
   }
   init() {
     this.setPlayer();
+    this.calcMovementForDices();
   }
   nextStep() {
     this.nextPlayer();
@@ -156,5 +157,55 @@ export class Game {
     this.nextButton.setText(
       "=> " + this.turn + "." + (this.currentPlayer.index + 1)
     );
+  }
+  calcMovementForDices() {
+    let colors = this.diceField.getDiceColors();
+    let values = this.diceField.getDiceValues();
+    let regions = [];
+
+    let test = this.getRegionsdForDices(colors, values);
+    console.log(test);
+  }
+  getRegionsdForDices(colors: String[], values: number[]): any[] {
+    let player = this.currentPlayer;
+    let regionsIndexes: any[] = [];
+    console.log(colors);
+    for (let i = 0; i < player.reachableRegion.length; i++) {
+      const obj = player.reachableRegion[i];
+      const cell = this.grid.grid[obj.x][obj.y];
+      let cellColor = this.convertDectoHex(cell.getColor());
+      if (colors.includes(cellColor)) {
+        const regionIndex = cell.getRegionIndex();
+        if (this.hasRegionEnoughFreeCellsForDice(regionIndex, values)) {
+          regionsIndexes.push(regionIndex);
+        }
+      }
+    }
+    return regionsIndexes;
+  }
+  hasRegionEnoughFreeCellsForDice(
+    regionIndex: number,
+    values: number[]
+  ): boolean {
+    const region = this.grid.getRegion(regionIndex);
+    let freeCells = 0;
+    for (let i = 0; i < region.length; i++) {
+      const cell = region[i];
+      let player = this.currentPlayer;
+      freeCells = freeCells + 1;
+      if (player.isCellInMarkedRegion(cell)) {
+        freeCells = freeCells - 1;
+      }
+      console.log(freeCells);
+    }
+    /**
+     * @todo is dice value >= freeCells;
+     */
+    // if (freeCells >= dice)
+
+    return true;
+  }
+  convertDectoHex(dec: Number): String {
+    return "#" + dec.toString(16);
   }
 }
