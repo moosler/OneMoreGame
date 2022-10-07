@@ -123,6 +123,9 @@ export class Rect {
   getText() {
     return this.text;
   }
+  styleCell() {
+    this.setStroke(this.style.strokeColor, this.style.strokWeigth);
+  }
   setStyle(obj: Phaser.GameObjects.Text, depth = 1) {
     obj.setStroke("#111", 6);
     obj.setShadow(2, 2, "#333333", 2, true, true);

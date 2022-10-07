@@ -154,6 +154,7 @@ export class Grid {
           cell.setText("");
         }
         cell.resetHighlight();
+        cell.styleCell();
       }
     }
   }
@@ -292,7 +293,6 @@ export class Grid {
     return this.regions[index];
   }
   highlightRegion(regions: any[]) {
-    let playerRegions = 0;
     for (let i = 0; i < regions.length; i++) {
       const regionIndex = regions[i];
       const region = this.regions[regionIndex];

@@ -4,7 +4,7 @@ export default {
   // type: Phaser.AUTO,
   type: Phaser.CANVAS,
   parent: "game",
-  backgroundColor: "#4c4275",
+  backgroundColor: "#1E1E1E",
   scale: {
     width: 800,
     height: 600,

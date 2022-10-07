@@ -16,8 +16,13 @@ export var Rand = new Random();
 let diceColors = ["#62b1db", "#c66a8d", "#ae7749", "#c8b47f", "#58853e", "#111111"];
  * 
  */
+// Blue #24287B
+// red #DD292B
+// orange #EF7D36
+// yellow #E6DC3F
+// green #44A043
 export const rectColors = [
-  { r: 98, g: 177, b: 219 }, //blue #62b1db //6468059
+  { r: 98, g: 177, b: 219 }, //blue #62b1db //6468059 #24287B
   { r: 198, g: 106, b: 141 }, //red #c66a8d //13003405
   { r: 174, g: 119, b: 73 }, //orange #ae7749 // 11433801
   { r: 200, g: 180, b: 127 }, //yellow #c8b47f //13153407
