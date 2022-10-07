@@ -7,6 +7,9 @@ import { PointsCol } from "./pointsCol";
 import { DiceField } from "./diceField";
 import { Button } from "./button";
 import { Player } from "./player";
+import { Random } from "./random";
+
+export var Rand = new Random();
 
 /**
  * @todo use hex Colors
@@ -123,7 +126,9 @@ export class Game {
   }
   init() {
     this.setPlayer();
-    this.calcMovementForDices();
+    this.grid.resetCells();
+    let regions = this.calcMovementForDices();
+    this.grid.highlightRegion(regions);
   }
   nextStep() {
     this.nextPlayer();
@@ -158,21 +163,38 @@ export class Game {
       "=> " + this.turn + "." + (this.currentPlayer.index + 1)
     );
   }
-  calcMovementForDices() {
+  calcMovementForDices(): number[] {
+    //only for debug
+    this.diceField.shuffleDices();
+
     let colors = this.diceField.getDiceColors();
     let values = this.diceField.getDiceValues();
-    let regions = [];
 
-    let test = this.getRegionsdForDices(colors, values);
-    console.log(test);
+    let regions = this.getRegionsdForDices(colors, values);
+    let uniqueRegions = regions.filter(function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index;
+    });
+    /**
+     * @todo calc if each region has contiguous free Cells
+     *
+     */
+    return uniqueRegions;
   }
+  /**
+   * Calculates if a region has enough free cells based on the rolled numbers of the dice.
+   * Attention!
+   * It is not considered whether the free cells are contiguous. It may be that the region was separated by a previously set cell.
+   * @param colors
+   * @param values
+   * @returns
+   */
   getRegionsdForDices(colors: String[], values: number[]): any[] {
     let player = this.currentPlayer;
     let regionsIndexes: any[] = [];
-    console.log(colors);
     for (let i = 0; i < player.reachableRegion.length; i++) {
       const obj = player.reachableRegion[i];
       const cell = this.grid.grid[obj.x][obj.y];
+
       let cellColor = this.convertDectoHex(cell.getColor());
       if (colors.includes(cellColor)) {
         const regionIndex = cell.getRegionIndex();
@@ -183,28 +205,45 @@ export class Game {
     }
     return regionsIndexes;
   }
+
+  /**
+   * calculates if a region has enough free Cells (not marked) for the dice values
+   * @param regionIndex
+   * @param values
+   * @returns
+   */
   hasRegionEnoughFreeCellsForDice(
     regionIndex: number,
     values: number[]
   ): boolean {
     const region = this.grid.getRegion(regionIndex);
+    let freeCells = this.getFreeRegionCount(region);
+    for (let i = 0; i < values.length; i++) {
+      const number = values[i];
+      if (number <= freeCells) {
+        return true;
+      }
+    }
+    return false;
+  }
+  /**
+   * calculates for each region how many free Cells (not marked) exist
+   * @param region
+   * @returns
+   */
+  getFreeRegionCount(region: string | any[]): number {
     let freeCells = 0;
     for (let i = 0; i < region.length; i++) {
       const cell = region[i];
       let player = this.currentPlayer;
       freeCells = freeCells + 1;
-      if (player.isCellInMarkedRegion(cell)) {
+      if (cell.getText() === "X") {
         freeCells = freeCells - 1;
       }
-      console.log(freeCells);
     }
-    /**
-     * @todo is dice value >= freeCells;
-     */
-    // if (freeCells >= dice)
-
-    return true;
+    return freeCells;
   }
+
   convertDectoHex(dec: Number): String {
     return "#" + dec.toString(16);
   }

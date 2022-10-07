@@ -14,11 +14,11 @@ let textStyle = {
 
 export const diceValues = [1, 2, 3, 4, 5, "?"];
 export const diceColors = [
-  "#62b1db",
-  "#c66a8d",
-  "#ae7749",
-  "#c8b47f",
-  "#58853e",
+  "#62b1db", //blue
+  "#c66a8d", //red
+  "#ae7749", //orange
+  "#c8b47f", //yellow
+  "#58853e", //green
   "#111111",
 ];
 
@@ -113,8 +113,11 @@ export class Dice {
     }
     return dice;
   }
-  setNewDiceValue() {
+  setNewDiceValue(value = null) {
     let val = this.getNewDiceValue();
+    if (value !== null) {
+      val = value;
+    }
     this.text = val;
     this.drawDice();
   }

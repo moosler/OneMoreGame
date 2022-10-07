@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { Rect } from "./rect";
-import { rectColors } from "./game";
+import { rectColors, Rand } from "./game";
 import { styleDefaultRect } from "./game";
 
 export class Grid {
@@ -38,8 +38,9 @@ export class Grid {
         this.marginLeft +
         this.rectSize / 2;
       for (let j = 0; j < this.rows; j++) {
+        //Math.random();
         let randColor =
-          rectColors[Math.floor(Math.random() * rectColors.length)];
+          rectColors[Math.floor(Rand.random() * rectColors.length)];
         const color = new Phaser.Display.Color(
           randColor.r,
           randColor.g,
@@ -89,7 +90,7 @@ export class Grid {
     }
 
     for (let i = 0; i < dif; i++) {
-      let color = rowArr[Math.floor(Math.random() * rowArr.length)];
+      let color = rowArr[Math.floor(Rand.random() * rowArr.length)];
       rowArr.push(color);
     }
     rowArr.sort();
@@ -109,12 +110,12 @@ export class Grid {
   }
   setStar(color: Phaser.Display.Color) {
     let cell =
-      this.grid[Math.floor(Math.random() * this.cols)][
-        Math.floor(Math.random() * this.rows)
+      this.grid[Math.floor(Rand.random() * this.cols)][
+        Math.floor(Rand.random() * this.rows)
       ];
     while (cell.style.color !== color.color) {
-      let randX = Math.floor(Math.random() * this.cols);
-      let randY = Math.floor(Math.random() * this.rows);
+      let randX = Math.floor(Rand.random() * this.cols);
+      let randY = Math.floor(Rand.random() * this.rows);
       cell = this.grid[randX][randY];
     }
     cell.setStar();
@@ -133,6 +134,10 @@ export class Grid {
   drawCells(region: { x: number; y: number }[]) {
     this.redrawRegion(region);
   }
+  /**
+   * draws all X for the players marked region
+   * @param region
+   */
   redrawRegion(region: { x: number; y: number }[]) {
     for (let i = 0; i < region.length; i++) {
       const element = region[i];
@@ -148,6 +153,7 @@ export class Grid {
         if (text) {
           cell.setText("");
         }
+        cell.resetHighlight();
       }
     }
   }
@@ -284,5 +290,16 @@ export class Grid {
   }
   getRegion(index: number) {
     return this.regions[index];
+  }
+  highlightRegion(regions: any[]) {
+    let playerRegions = 0;
+    for (let i = 0; i < regions.length; i++) {
+      const regionIndex = regions[i];
+      const region = this.regions[regionIndex];
+      for (let i = 0; i < region.length; i++) {
+        const cell = region[i];
+        cell.highlightCell();
+      }
+    }
   }
 }

@@ -38,15 +38,15 @@ export class Player {
       arr.push(obj);
     }
   }
-  isCellInMarkedRegion(cell: Rect): boolean {
-    for (let j = 0; j < this.markedRegion.length; j++) {
-      const markedCell = this.markedRegion[j];
-      if (markedCell.x == cell.x && markedCell.y == cell.y) {
-        return true;
-      }
-    }
-    return false;
-  }
+  // isCellInMarkedRegion(cell: Rect): boolean {
+  //   for (let j = 0; j < this.markedRegion.length; j++) {
+  //     const markedCell = this.markedRegion[j];
+  //     if (markedCell.x == cell.x && markedCell.y == cell.y) {
+  //       return true;
+  //     }
+  //   }
+  //   return false;
+  // }
 
   calcMovePosibilites() {
     //this.reachableRegion not marked

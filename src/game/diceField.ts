@@ -99,9 +99,15 @@ export class DiceField {
     return unique;
   }
   shuffleDices() {
+    /**
+     * only for debugging
+     * @todo has to be removed
+     */
+    let test = ["4", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
+
     for (let i = 0; i < this.dices.length; i++) {
       const dice = this.dices[i];
-      dice.setNewDiceValue();
+      dice.setNewDiceValue(test[i]);
     }
   }
 }

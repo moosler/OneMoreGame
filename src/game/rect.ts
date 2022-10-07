@@ -14,6 +14,10 @@ let hightlightStyle = {
   strokeColor: 0xc3c3c3,
   strokWeigth: 4,
 };
+let hightlightRegionStyle = {
+  strokeColor: 0x38c885,
+  strokWeigth: 4,
+};
 
 export class Rect {
   rectSize: number;
@@ -116,6 +120,9 @@ export class Rect {
     this.setStyle(this.textObject);
     Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
   }
+  getText() {
+    return this.text;
+  }
   setStyle(obj: Phaser.GameObjects.Text, depth = 1) {
     obj.setStroke("#111", 6);
     obj.setShadow(2, 2, "#333333", 2, true, true);
@@ -144,11 +151,22 @@ export class Rect {
   setMark(marked = true) {
     this.marked = marked;
   }
-  hightlightCell() {
+  highlightCell() {
     this.highlight = true;
-    this.setStroke(hightlightStyle.strokeColor, hightlightStyle.strokWeigth);
-    this.style.strokeColor = hightlightStyle.strokeColor;
-    this.style.strokWeigth = hightlightStyle.strokWeigth;
+    this.setStroke(
+      hightlightRegionStyle.strokeColor,
+      hightlightRegionStyle.strokWeigth
+    );
+    this.style.strokeColor = hightlightRegionStyle.strokeColor;
+    this.style.strokWeigth = hightlightRegionStyle.strokWeigth;
+  }
+  resetHighlight() {
+    if (this.highlight === true) {
+      this.setStroke(
+        styleDefaultRect.strokeColor,
+        styleDefaultRect.strokWeigth
+      );
+    }
   }
   setStar() {
     this.isStar = true;
