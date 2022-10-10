@@ -1,22 +1,42 @@
 import Phaser from "phaser";
-import { gameInstance } from "../scenes/Game";
-import { styleDefaultRect } from "./game";
-/**
- * @todo set Color Style here
- */
 
-let pointOverSytle = {
-  strokeColor: 0xefc53f,
-  strokWeigth: 4,
-};
-
-let hightlightStyle = {
-  strokeColor: 0xc3c3c3,
-  strokWeigth: 4,
-};
-let hightlightRegionStyle = {
-  strokeColor: 0x38c885,
-  strokWeigth: 4,
+export let styleNonInteractiveRect = {
+  fill: 0xff0000,
+  strokeColor: 0x2e4053,
+  strokeColorStart: 0xeaeded,
+  strokeWeigth: 2,
+  depth: 1,
+  alpha: 1,
+  font: {
+    size: 15, //is calculated depending on the cell
+    font: "Arial Black",
+    fill: "#879eb4",
+    fillPermanent: "#974c75",
+    strokeColor: "#111",
+    strokeWeight: 6,
+    multiplier: 1,
+    depth: 3,
+    shadow: {
+      x: 2,
+      y: 2,
+      color: "#333333",
+      blur: 2,
+      stroke: true,
+      fill: true,
+    },
+  },
+  hover: {
+    strokeColor: 0xefc53f,
+    strokeWeigth: 4,
+  },
+  highlight: {
+    strokeColor: 0x38c885,
+    strokeWeigth: 4,
+  },
+  highlightPermanent: {
+    strokeColor: 0xc3c3c3,
+    strokeWeigth: 4,
+  },
 };
 
 export class Rect {
@@ -26,22 +46,25 @@ export class Rect {
   group: any;
   scene: Phaser.Scene;
   style: {
-    color: number;
+    font: any;
+    fill: number;
     strokeColor: number;
     strokeColorStart: number;
     strokWeigth: number;
+    depth: number;
+    highlightPermanent: any;
+    alpha: number;
+    strokeWeigth: number;
+    highlight: any;
+    hover: any;
   };
-  isMid: boolean;
   gameObject: Phaser.GameObjects.Rectangle;
   text: string;
-  isInteractive: boolean;
   textObject: Phaser.GameObjects.Text;
   pos: { x: number; y: number };
-  marked: boolean;
   highlight: boolean;
-  regionIndex: number;
-  isStar: undefined | boolean;
-  starObject: Phaser.GameObjects.Text | undefined;
+  isHovered: boolean;
+  highlightPermanent: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -51,141 +74,102 @@ export class Rect {
     isMid: boolean,
     style: any,
     text: string = "",
-    pos: { x: number; y: number } = { x: 0, y: 0 },
-    isInteractive = false
+    pos: { x: number; y: number } = { x: 0, y: 0 }
   ) {
+    this.scene = scene;
     this.x = x;
     this.y = y;
     this.rectSize = rectSize;
-    this.text = text;
-    this.scene = scene;
-    this.isMid = isMid;
     this.style = style;
+    this.text = text;
     this.pos = pos;
-    this.isInteractive = isInteractive;
-    this.marked = false;
-    this.highlight = false;
-    this.regionIndex = -1;
-    this.isStar = undefined;
+    this.highlightPermanent = isMid;
+
     if (isMid) {
       this.style.strokeColor = this.style.strokeColorStart;
     }
+    this.style = {
+      ...styleNonInteractiveRect,
+      ...style,
+    };
     this.gameObject = new Phaser.GameObjects.Rectangle(
       this.scene,
       this.x,
       this.y,
       this.rectSize,
       this.rectSize,
-      this.style.color
+      this.style.fill
     );
     this.textObject = this.scene.add.text(
       this.x - this.rectSize * 0.5,
       this.y - this.rectSize * 0.5,
       this.text,
-      this.getStyle()
+      {
+        font: this.style.font.size + "px " + this.style.font.font,
+        color: this.style.font.fill,
+      }
     );
-    this.starObject = undefined;
-
+    this.highlight = false; //highlight region
+    this.isHovered = false;
     this.init();
   }
   init() {
-    this.gameObject.setStrokeStyle(
-      this.style.strokWeigth,
-      this.style.strokeColor
-    );
-    if (this.isInteractive) {
-      this.gameObject.setInteractive();
-      this.gameObject.on("pointerover", () => {
-        this.setStroke(pointOverSytle.strokeColor, pointOverSytle.strokWeigth);
-      });
-      this.gameObject.on("pointerout", () => {
-        this.setStroke(this.style.strokeColor, this.style.strokWeigth);
-      });
-      this.gameObject.on("pointerdown", () => {
-        gameInstance.currentPlayer.setMark(
-          this,
-          gameInstance.grid.getNeighbors(this, false, false)
-        );
-        this.setText("X");
-        this.setMark();
-      });
-    }
-    if (this.text !== "") {
-      this.setText(this.text);
-    }
+    this.style.font.size = this.rectSize * 0.5 * this.style.font.multiplier;
+    this.setTextStyle();
+    this.setRectStyle();
+    this.draw();
   }
-  setText(text: string) {
-    this.textObject.text = text;
-    this.text = text;
-    this.setStyle(this.textObject);
+  setTextStyle() {
+    let size = this.style.font.size;
+
+    this.textObject.setFontStyle(size + "px");
+
+    this.textObject.setStroke(
+      this.style.font.strokeColor,
+      this.style.font.strokeWeight
+    );
+    // this.textObject.setFill(0xff00ff);
+    let color = this.style.font.fill;
+    if (this.highlightPermanent) {
+      color = this.style.font.fillPermanent;
+    }
+    this.textObject.setColor(color);
+    this.textObject.setShadow(
+      this.style.font.shadow.x,
+      this.style.font.shadow.y,
+      this.style.font.shadow.color,
+      this.style.font.shadow.blur,
+      this.style.font.shadow.stroke,
+      this.style.font.shadow.fill
+    );
+    this.textObject.setDepth(this.style.font.depth);
     Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
   }
-  getText() {
-    return this.text;
+  setFill(color: number) {
+    this.style.fill = color;
+    this.gameObject.setFillStyle(this.style.fill, this.style.alpha);
   }
-  styleCell() {
-    this.setStroke(this.style.strokeColor, this.style.strokWeigth);
-  }
-  setStyle(obj: Phaser.GameObjects.Text, depth = 1) {
-    obj.setStroke("#111", 6);
-    obj.setShadow(2, 2, "#333333", 2, true, true);
-    obj.setDepth(depth);
-  }
-  getStyle(fontMultiplier = 1) {
-    let fill = "#879eb4";
-    if (this.isMid) {
-      fill = "#974c75";
+  setRectStyle() {
+    this.gameObject.setDepth(this.style.depth);
+    this.gameObject.setFillStyle(this.style.fill, this.style.alpha);
+    let strokeColor = this.style.strokeColor;
+    let strokeWeight = this.style.strokeWeigth;
+    if (this.highlight) {
+      strokeColor = this.style.highlight.strokeColor;
+      strokeWeight = this.style.highlight.strokeWeigth;
     }
-    return {
-      font: this.rectSize * 0.5 * fontMultiplier + "px Arial Black",
-      fill: fill,
-    };
-  }
-  setColor(colorObj: number) {
-    this.gameObject.fillColor = colorObj;
-    this.style.color = colorObj;
-  }
-  setStroke(color: number, weight: number = 2) {
-    this.gameObject.setStrokeStyle(weight, color);
-  }
-  /**
-   * sets Cell as visited
-   */
-  setMark(marked = true) {
-    this.marked = marked;
-  }
-  highlightCell() {
-    this.highlight = true;
-    this.setStroke(
-      hightlightRegionStyle.strokeColor,
-      hightlightRegionStyle.strokWeigth
-    );
-    this.style.strokeColor = hightlightRegionStyle.strokeColor;
-    this.style.strokWeigth = hightlightRegionStyle.strokWeigth;
-  }
-  resetHighlight() {
-    if (this.highlight === true) {
-      this.setStroke(
-        styleDefaultRect.strokeColor,
-        styleDefaultRect.strokWeigth
-      );
+    if (this.highlightPermanent) {
+      strokeColor = this.style.highlightPermanent.strokeColor;
+      strokeWeight = this.style.highlightPermanent.strokeWeigth;
     }
+    if (this.isHovered) {
+      strokeColor = this.style.hover.strokeColor;
+      strokeWeight = this.style.hover.strokeWeigth;
+    }
+    this.gameObject.setStrokeStyle(strokeWeight, strokeColor);
   }
-  setStar() {
-    this.isStar = true;
-    this.starObject = this.scene.add.text(
-      this.x - this.rectSize * 0.5,
-      this.y - this.rectSize * 0.5,
-      "★",
-      this.getStyle(1.75)
-    );
-    this.setStyle(this.starObject, 0);
-    Phaser.Display.Align.In.Center(this.starObject, this.gameObject);
-  }
-  getRegionIndex(): number {
-    return this.regionIndex;
-  }
-  getColor() {
-    return this.style.color;
+  draw() {
+    this.setRectStyle();
+    this.setTextStyle();
   }
 }

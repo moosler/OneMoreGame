@@ -38,21 +38,38 @@ export class PointsCol {
   }
   init() {
     for (let i = 0; i < rectColors.length; i++) {
-      const color = new Phaser.Display.Color(rectColors[i].r, rectColors[i].g, rectColors[i].b);
+      const color = new Phaser.Display.Color(
+        rectColors[i].r,
+        rectColors[i].g,
+        rectColors[i].b
+      );
 
       let style = {
-        ...styleDefaultRect,
-        ...{
-          color: color.color,
-        },
+        fill: color.color,
       };
       let y = i * (this.rectSize + this.strokWeigth) + this.y;
       this.elements[0] = new Array(rectColors.length);
-      this.elements[0][i] = new Rect(this.scene, this.x, y, this.rectSize, false, style, String(5));
+      this.elements[0][i] = new Rect(
+        this.scene,
+        this.x,
+        y,
+        this.rectSize,
+        false,
+        style,
+        String(5)
+      );
       this.group.add(this.elements[0][i].gameObject, true);
       let x = this.x + (this.rectSize + this.strokWeigth);
       this.elements[1] = new Array(rectColors.length);
-      this.elements[1][i] = new Rect(this.scene, x, y, this.rectSize, false, style, String(3));
+      this.elements[1][i] = new Rect(
+        this.scene,
+        x,
+        y,
+        this.rectSize,
+        false,
+        style,
+        String(3)
+      );
       this.group.add(this.elements[1][i].gameObject, true);
     }
     let j = 0;

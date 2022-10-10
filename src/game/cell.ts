@@ -1,9 +1,10 @@
 import Phaser from "phaser";
+import { CellBorder } from "../game/cellBorders";
 import { gameInstance } from "../scenes/Game";
 
 export let styleDefaultRect = {
   fill: 0xff0000,
-  strokeColor: 0xeeeeee,
+  strokeColor: 0x2e4053,
   strokeColorStart: 0xeaeded,
   strokeWeigth: 2,
   depth: 1,
@@ -61,6 +62,7 @@ export class Cell {
   highlightPermanent: boolean;
   isX: boolean;
   starObject: Phaser.GameObjects.Text | undefined;
+  borders: CellBorder[];
 
   constructor(
     scene: Phaser.Scene,
@@ -85,6 +87,7 @@ export class Cell {
       ...styleDefaultRect,
       ...style,
     };
+    // console.log(this.style);
 
     this.gameObject = new Phaser.GameObjects.Rectangle(
       this.scene,
@@ -92,7 +95,7 @@ export class Cell {
       this.y,
       this.rectSize,
       this.rectSize,
-      this.style.color
+      this.style.fill
     );
     this.textObject = this.scene.add.text(
       this.x - this.rectSize * 0.5,
@@ -109,8 +112,17 @@ export class Cell {
     this.regionIndex = -1;
     this.isStar = undefined;
     this.starObject = undefined;
+    this.borders = this.initBorders();
 
     this.init();
+  }
+  initBorders() {
+    return [
+      new CellBorder(this, this.scene, "north"),
+      new CellBorder(this, this.scene, "east"),
+      new CellBorder(this, this.scene, "south"),
+      new CellBorder(this, this.scene, "west"),
+    ];
   }
   init() {
     this.style.font.size = this.rectSize * 0.5 * this.style.font.multiplier;
@@ -121,16 +133,7 @@ export class Cell {
   }
   setTextStyle() {
     let size = this.style.font.size;
-
-    /**
-     * @todo set Star
-     *
-     */
-    if (this.isStar) {
-      // size = size * this.style.font.starMultiplier;
-    }
     this.textObject.setFontStyle(size + "px");
-
     this.textObject.setStroke(
       this.style.font.strokeColor,
       this.style.font.strokeWeight
@@ -152,24 +155,23 @@ export class Cell {
     this.textObject.setDepth(this.style.font.depth);
     Phaser.Display.Align.In.Center(this.textObject, this.gameObject);
   }
+  setFill(color: number) {
+    this.style.fill = color;
+    this.gameObject.setFillStyle(this.style.fill, this.style.alpha);
+  }
   setRectStyle() {
-    //remove next three lines!!!!!!!!!
-    let group = this.scene.physics.add.staticGroup();
-    group.add(this.gameObject, true);
-    this.scene.physics.add.staticGroup(this.gameObject);
-
     this.gameObject.setDepth(this.style.depth);
     this.gameObject.setFillStyle(this.style.fill, this.style.alpha);
     let strokeColor = this.style.strokeColor;
     let strokeWeight = this.style.strokeWeigth;
-    if (this.highlight) {
-      strokeColor = this.style.highlight.strokeColor;
-      strokeWeight = this.style.highlight.strokeWeigth;
-    }
+
     if (this.highlightPermanent) {
       strokeColor = this.style.highlightPermanent.strokeColor;
       strokeWeight = this.style.highlightPermanent.strokeWeigth;
-      console.log(strokeColor);
+    }
+    if (this.highlight) {
+      strokeColor = this.style.highlight.strokeColor;
+      strokeWeight = this.style.highlight.strokeWeigth;
     }
     if (this.isHovered) {
       strokeColor = this.style.hover.strokeColor;
@@ -189,16 +191,29 @@ export class Cell {
         this.draw();
       });
       this.gameObject.on("pointerdown", () => {
-        // gameInstance.currentPlayer.setMark(
-        //   this,
-        //   gameInstance.grid.getNeighbors(this, false, false)
-        // );
-        this.setX();
+        this.setXForPlayer();
       });
     }
   }
   setStroke(color: number, weight: number = 2) {
     this.gameObject.setStrokeStyle(weight, color);
+  }
+  /**
+   * sets Cell as visited
+   */
+  setMark(marked = true) {
+    this.marked = marked;
+  }
+  setHighlight(neighbors: Cell[]) {
+    this.highlight = true;
+    for (let i = 0; i < this.borders.length; i++) {
+      const border = this.borders[i];
+      border.show(neighbors);
+    }
+  }
+  setXForPlayer() {
+    gameInstance.currentPlayer.setMark(this, this.getNeighbors());
+    this.setX();
   }
   setX(marked = true) {
     this.isX = marked;
@@ -241,5 +256,23 @@ export class Cell {
   draw() {
     this.setRectStyle();
     this.setTextStyle();
+  }
+  resetCell() {
+    this.isX = false;
+    this.setText("");
+    this.highlight = false;
+    this.draw();
+  }
+  getNeighbors() {
+    return gameInstance.grid.getNeighbors(this, false, false);
+  }
+  getRegionIndex(): number {
+    return this.regionIndex;
+  }
+  getColor() {
+    return this.style.fill;
+  }
+  getText() {
+    return this.text;
   }
 }

@@ -12,6 +12,13 @@ import { Random } from "./random";
 export var Rand = new Random();
 
 /**
+ * only for debugging
+ * @todo has to be removed
+ */
+let debugShuffle = ["2", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
+/** */
+
+/**
  * @todo use hex Colors
 let diceColors = ["#62b1db", "#c66a8d", "#ae7749", "#c8b47f", "#58853e", "#111111"];
  * 
@@ -28,13 +35,6 @@ export const rectColors = [
   { r: 200, g: 180, b: 127 }, //yellow #c8b47f //13153407
   { r: 88, g: 133, b: 62 }, //green #58853e // 5801278
 ];
-
-export let styleDefaultRect = {
-  color: 0xff0000,
-  strokeColor: 0x2e4053,
-  strokeColorStart: 0xeaeded,
-  strokWeigth: 2,
-};
 
 export class Game {
   scene: Phaser.Scene;
@@ -130,16 +130,34 @@ export class Game {
     this.init();
   }
   init() {
+    /**
+     * only for debug
+     */
+    this.diceField.shuffleDices(debugShuffle);
+    let cell = this.grid.grid[7][3];
+    // this.players[0].setMark(cell, this.grid.getNeighbors(cell, false, false));
+    let cell2 = this.grid.grid[8][3];
+    // this.players[0].setMark(cell2, this.grid.getNeighbors(cell2, false, false));
+    /** */
+
     this.setPlayer();
     this.grid.resetCells();
+    this.grid.drawCells(this.currentPlayer.markedRegion);
+    this.highlightMovements();
+  }
+  highlightMovements() {
     let regions = this.calcMovementForDices();
     this.grid.highlightRegion(regions);
   }
   nextStep() {
     this.nextPlayer();
-    this.diceField.shuffleDices();
+    /**
+     * @todo remove debug
+     */
+    this.diceField.shuffleDices(debugShuffle);
     this.grid.resetCells();
     this.grid.drawCells(this.currentPlayer.markedRegion);
+    this.highlightMovements();
   }
   rotatePlayerArray() {
     let first = this.players.shift();
@@ -169,9 +187,6 @@ export class Game {
     );
   }
   calcMovementForDices(): number[] {
-    //only for debug
-    this.diceField.shuffleDices();
-
     let colors = this.diceField.getDiceColors();
     let values = this.diceField.getDiceValues();
 
@@ -242,7 +257,7 @@ export class Game {
       const cell = region[i];
       let player = this.currentPlayer;
       freeCells = freeCells + 1;
-      if (cell.getText() === "X") {
+      if (cell.isX) {
         freeCells = freeCells - 1;
       }
     }

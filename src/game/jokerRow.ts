@@ -26,13 +26,19 @@ export class JokerRow {
   init() {
     for (let i = 0; i < this.cols / 2; i++) {
       let style = {
-        ...styleDefaultRect,
-        ...{
-          color: 0xffffff,
-        },
+        fill: 0xffffff,
       };
-      let x = i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
-      this.elements[i] = new Rect(this.scene, x, this.y, this.rectSize, false, style, "!");
+      let x =
+        i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
+      this.elements[i] = new Rect(
+        this.scene,
+        x,
+        this.y,
+        this.rectSize,
+        false,
+        style,
+        "!"
+      );
       this.group.add(this.elements[i].gameObject, true);
     }
   }

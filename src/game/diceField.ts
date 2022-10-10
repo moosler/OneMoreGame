@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { Dice, diceColors, diceValues } from "./dice";
 
 let style = {
-  color: 0xaaaaaa,
+  fill: 0xaaaaaa,
   strokeColor: 0x2e4053,
   strokWeigth: 2,
 };
@@ -41,7 +41,7 @@ export class DiceField {
       this.y,
       this.rectSize * this.dicesNo + this.margin * 2,
       this.rectSize + this.margin * 2,
-      style.color
+      style.fill
     );
     this.field.setStrokeStyle(style.strokWeigth, style.strokeColor);
     this.groupField.add(this.field, true);
@@ -98,16 +98,14 @@ export class DiceField {
     });
     return unique;
   }
-  shuffleDices() {
-    /**
-     * only for debugging
-     * @todo has to be removed
-     */
-    let test = ["4", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
-
+  shuffleDices(arr: string[] | null = null) {
     for (let i = 0; i < this.dices.length; i++) {
       const dice = this.dices[i];
-      dice.setNewDiceValue(test[i]);
+      if (arr) {
+        dice.setNewDiceValue(arr[i]);
+      } else {
+        dice.setNewDiceValue();
+      }
     }
   }
 }

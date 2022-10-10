@@ -1,4 +1,5 @@
-import { Rect } from "./rect";
+// import { Rect } from "./rect";
+import { Cell } from "./cell";
 export class Player {
   name: String;
   reachableRegion: { x: number; y: number }[];
@@ -17,7 +18,7 @@ export class Player {
     this.init();
   }
   init() {}
-  setMark(cell: Rect, neighbors: Rect[]) {
+  setMark(cell: Cell, neighbors: Cell[]) {
     let obj = { x: cell.pos.x, y: cell.pos.y };
     //add cell to markedRegion
     this.addToArrayIfNotExist(obj, this.markedRegion);

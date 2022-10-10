@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 
 let style = {
-  color: 0x333333,
+  fill: 0x333333,
   strokeColor: 0xbbbbbb,
   strokWeigth: 2,
 };
@@ -62,7 +62,7 @@ export class Dice {
       this.y,
       this.rectSize,
       this.rectSize,
-      style.color
+      style.fill
     );
     this.init();
   }

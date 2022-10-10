@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import { Rect } from "./rect";
+import { Cell } from "./cell";
 import { rectColors, Rand } from "./game";
-import { styleDefaultRect } from "./game";
+// import { styleDefaultRect } from "./game";
 
 export class Grid {
   group: Phaser.Physics.Arcade.StaticGroup;
@@ -12,9 +13,10 @@ export class Grid {
   marginLeft: number;
   marginTop: number;
   strokWeigth: number;
-  grid: Rect[][];
-  coherentCells: Rect[];
-  regions: Rect[][];
+  // grid: Rect[][];
+  grid: Cell[][];
+  coherentCells: Cell[];
+  regions: Cell[][];
   constructor(scene: Phaser.Scene, mLeft: number, mTop: number) {
     this.scene = scene;
     this.group = this.scene.physics.add.staticGroup();
@@ -51,21 +53,20 @@ export class Grid {
           this.marginTop +
           this.rectSize / 2;
         let style = {
-          ...styleDefaultRect,
-          ...{
-            color: color.color,
-          },
+          fill: color.color,
         };
-        this.grid[i][j] = new Rect(
+        // console.log(style);
+
+        this.grid[i][j] = new Cell(
           this.scene,
           x,
           y,
           this.rectSize,
-          isMid,
-          style,
-          "",
           { x: i, y: j },
-          true
+          "",
+          true,
+          isMid,
+          style
         );
         this.group.add(this.grid[i][j].gameObject, true);
       }
@@ -96,7 +97,8 @@ export class Grid {
     rowArr.sort();
     let mid = Math.floor(this.cols / 2);
     for (let j = 0; j < this.grid[0].length; j++) {
-      this.grid[mid][j].setColor(rowArr[j]);
+      // this.grid[mid][j].setColor(rowArr[j]);
+      this.grid[mid][j].setFill(rowArr[j]);
     }
   }
   setStars() {
@@ -113,7 +115,7 @@ export class Grid {
       this.grid[Math.floor(Rand.random() * this.cols)][
         Math.floor(Rand.random() * this.rows)
       ];
-    while (cell.style.color !== color.color) {
+    while (cell.style.fill !== color.color) {
       let randX = Math.floor(Rand.random() * this.cols);
       let randY = Math.floor(Rand.random() * this.rows);
       cell = this.grid[randX][randY];
@@ -142,19 +144,14 @@ export class Grid {
     for (let i = 0; i < region.length; i++) {
       const element = region[i];
       const cell = this.grid[element.x][element.y];
-      cell.setText("X");
+      cell.setX();
     }
   }
   resetCells(text: boolean = true) {
     for (let i = 0; i < this.cols; i++) {
       for (let j = 0; j < this.rows; j++) {
         let cell = this.grid[i][j];
-        cell.setMark(false);
-        if (text) {
-          cell.setText("");
-        }
-        cell.resetHighlight();
-        cell.styleCell();
+        cell.resetCell();
       }
     }
   }
@@ -163,7 +160,7 @@ export class Grid {
    * returns all contiguous cells of one color
    * @param cell
    */
-  setContiguousCell(cell: Rect) {
+  setContiguousCell(cell: Cell) {
     this.markCells(this.coherentCells, false); //reset current marking
     this.coherentCells = [];
     this.visit(cell);
@@ -174,7 +171,7 @@ export class Grid {
    * depth first search
    * @param cell
    */
-  visit(cell: Rect) {
+  visit(cell: Cell) {
     if (cell.marked) return;
     cell.setMark(true);
     this.coherentCells.push(cell);
@@ -188,7 +185,7 @@ export class Grid {
     }
   }
 
-  markCells(cells: Rect[], mark: boolean = true) {
+  markCells(cells: Cell[], mark: boolean = true) {
     for (let i = 0; i < cells.length; i++) {
       const cell = cells[i];
       cell.setMark(mark);
@@ -202,10 +199,12 @@ export class Grid {
    * @returns array with alle neighbors
    */
   getNeighbors(
-    cell: Rect,
+    cell: Cell,
     selfInclude: boolean = true,
     onlySameColor = true
-  ): Rect[] {
+  ): Cell[] {
+    // console.log(cell);
+
     let neighbors = [];
     if (selfInclude) neighbors.push(cell);
     if (this.isCellinGrid(cell.pos.x + 1, cell.pos.y)) {
@@ -235,13 +234,13 @@ export class Grid {
     return neighbors;
   }
 
-  checkCell(cell: Rect, cellB: Rect, onlySameColor: boolean) {
+  checkCell(cell: Cell, cellB: Cell, onlySameColor: boolean) {
     if (onlySameColor && !this.isSameColor(cell, cellB)) return false;
     return true;
   }
 
-  isSameColor(cellA: Rect, cellB: Rect) {
-    return cellA.style.color === cellB.style.color;
+  isSameColor(cellA: Cell, cellB: Cell) {
+    return cellA.style.fill === cellB.style.fill;
   }
   /**
    *
@@ -253,10 +252,11 @@ export class Grid {
     if (x > this.cols - 1 || y > this.rows - 1) return false;
     return true;
   }
-  highlightCells(cells: any[]) {
+  highlightCells(cells: Cell[]) {
     for (let i = 0; i < cells.length; i++) {
       const element = cells[i];
-      element.hightlightCell();
+      // element.hightlightCell();
+      element.draw();
     }
   }
 
@@ -296,9 +296,15 @@ export class Grid {
     for (let i = 0; i < regions.length; i++) {
       const regionIndex = regions[i];
       const region = this.regions[regionIndex];
+      console.log(region);
+
       for (let i = 0; i < region.length; i++) {
         const cell = region[i];
-        cell.highlightCell();
+        // if (!cell.isX) {
+        let neighbors = this.getNeighbors(cell, true, false);
+        cell.setHighlight(neighbors);
+        cell.draw();
+        // }
       }
     }
   }

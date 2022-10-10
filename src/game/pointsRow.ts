@@ -27,10 +27,7 @@ export class PointsRow {
   init() {
     for (let i = 0; i < this.cols; i++) {
       let style = {
-        ...styleDefaultRect,
-        ...{
-          color: 0xffffff,
-        },
+        fill: 0xffffff,
       };
       let mid = Math.floor(this.cols / 2);
       let isMid = mid == i;
@@ -49,7 +46,8 @@ export class PointsRow {
 
       //Top
       this.elements[0] = new Array(this.cols);
-      let x = i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
+      let x =
+        i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
       this.elements[0][i] = new Rect(
         this.scene,
         x,

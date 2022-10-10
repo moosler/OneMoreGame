@@ -27,13 +27,11 @@ export class TopRow {
   init() {
     for (let i = 0; i < this.cols; i++) {
       let style = {
-        ...styleDefaultRect,
-        ...{
-          color: 0xffffff,
-        },
+        fill: 0xffffff,
       };
       let isMid = Math.floor(this.cols / 2) == i;
-      let x = i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
+      let x =
+        i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
       this.elements[i] = new Rect(
         this.scene,
         x,
