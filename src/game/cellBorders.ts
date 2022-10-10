@@ -16,7 +16,7 @@ export class CellBorder {
     this.init();
   }
   init() {
-    this.graphics.fillStyle(0x00ff00, 1);
+    this.graphics.fillStyle(0x0000ff, 1);
 
     let x = this.cell.x - this.cell.rectSize * 0.5 - this.strokeWidth * 0.5;
     let y = this.cell.y - this.cell.rectSize * 0.5 - this.strokeWidth * 0.5;
@@ -54,6 +54,9 @@ export class CellBorder {
 
     // graphics.closePath();
     // graphics.strokePath();
+  }
+  reset() {
+    this.graphics.setVisible(false);
   }
   show(neighbors: Cell[]) {
     let pos = { ...this.cell.pos };

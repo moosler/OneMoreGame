@@ -1,6 +1,5 @@
 import Phaser from "phaser";
 import { Rect } from "./rect";
-import { styleDefaultRect } from "./game";
 
 export class PointsRow {
   scene: Phaser.Scene;

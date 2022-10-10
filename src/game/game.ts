@@ -11,11 +11,13 @@ import { Random } from "./random";
 
 export var Rand = new Random();
 
+var debug = false;
+
 /**
  * only for debugging
  * @todo has to be removed
  */
-let debugShuffle = ["2", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
+let debugShuffle = ["3", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
 /** */
 
 /**
@@ -133,11 +135,16 @@ export class Game {
     /**
      * only for debug
      */
-    this.diceField.shuffleDices(debugShuffle);
-    let cell = this.grid.grid[7][3];
-    // this.players[0].setMark(cell, this.grid.getNeighbors(cell, false, false));
-    let cell2 = this.grid.grid[8][3];
-    // this.players[0].setMark(cell2, this.grid.getNeighbors(cell2, false, false));
+    if (debug) {
+      this.diceField.shuffleDices(debugShuffle);
+      let cell = this.grid.grid[7][3];
+      this.players[0].setMark(cell, this.grid.getNeighbors(cell, false, false));
+      let cell2 = this.grid.grid[8][3];
+      this.players[0].setMark(
+        cell2,
+        this.grid.getNeighbors(cell2, false, false)
+      );
+    }
     /** */
 
     this.setPlayer();
@@ -154,7 +161,11 @@ export class Game {
     /**
      * @todo remove debug
      */
-    this.diceField.shuffleDices(debugShuffle);
+    let values = null;
+    if (debug) {
+      values = debugShuffle;
+    }
+    this.diceField.shuffleDices(values);
     this.grid.resetCells();
     this.grid.drawCells(this.currentPlayer.markedRegion);
     this.highlightMovements();
@@ -185,6 +196,7 @@ export class Game {
     this.nextButton.setText(
       "=> " + this.turn + "." + (this.currentPlayer.index + 1)
     );
+    this.showPointsForPlayer();
   }
   calcMovementForDices(): number[] {
     let colors = this.diceField.getDiceColors();
@@ -266,5 +278,17 @@ export class Game {
 
   convertDectoHex(dec: Number): String {
     return "#" + dec.toString(16);
+  }
+  showPointsForPlayer() {
+    let points = this.currentPlayer.getAllPoints();
+    this.pointsCol.bonusPoints?.setText(points["bonus"]);
+    this.pointsCol.colPoints?.setText(points["col"]);
+    this.pointsCol.jokerPoints?.setText(points["joker"]);
+    this.pointsCol.starPoints?.setText(points["star"]);
+    this.pointsCol.totalPoints?.setText(points["total"]);
+  }
+  setStarPoint() {
+    this.currentPlayer.incrementStarPoints();
+    this.showPointsForPlayer();
   }
 }

@@ -205,7 +205,7 @@ export class Cell {
     this.marked = marked;
   }
   setHighlight(neighbors: Cell[]) {
-    this.highlight = true;
+    // this.highlight = true;
     for (let i = 0; i < this.borders.length; i++) {
       const border = this.borders[i];
       border.show(neighbors);
@@ -213,7 +213,15 @@ export class Cell {
   }
   setXForPlayer() {
     gameInstance.currentPlayer.setMark(this, this.getNeighbors());
-    this.setX();
+    if (this.isPossibleMove()) {
+      this.setX();
+      if (this.isStar) {
+        gameInstance.setStarPoint();
+      }
+    }
+  }
+  isPossibleMove(): boolean {
+    return true;
   }
   setX(marked = true) {
     this.isX = marked;
@@ -261,6 +269,10 @@ export class Cell {
     this.isX = false;
     this.setText("");
     this.highlight = false;
+    for (let i = 0; i < this.borders.length; i++) {
+      const border = this.borders[i];
+      border.reset();
+    }
     this.draw();
   }
   getNeighbors() {

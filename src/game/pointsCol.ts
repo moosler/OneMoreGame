@@ -1,7 +1,6 @@
 import Phaser from "phaser";
 import { Rect } from "./rect";
 import { rectColors } from "./game";
-import { styleDefaultRect } from "./game";
 
 import { PointsField } from "./pointsField";
 

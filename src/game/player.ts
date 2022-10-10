@@ -5,6 +5,11 @@ export class Player {
   reachableRegion: { x: number; y: number }[];
   markedRegion: { x: number; y: number }[];
   index: number;
+  bonusPoints: number;
+  colPoints: number;
+  starPoints: number;
+  jokerPoints: number;
+  totalPoints: number;
 
   constructor(
     name: String,
@@ -15,6 +20,11 @@ export class Player {
     this.index = index;
     this.reachableRegion = reachableRegion;
     this.markedRegion = [];
+    this.bonusPoints = 0;
+    this.colPoints = 0;
+    this.starPoints = 0;
+    this.jokerPoints = 0;
+    this.totalPoints = 0;
     this.init();
   }
   init() {}
@@ -39,19 +49,37 @@ export class Player {
       arr.push(obj);
     }
   }
-  // isCellInMarkedRegion(cell: Rect): boolean {
-  //   for (let j = 0; j < this.markedRegion.length; j++) {
-  //     const markedCell = this.markedRegion[j];
-  //     if (markedCell.x == cell.x && markedCell.y == cell.y) {
-  //       return true;
-  //     }
-  //   }
-  //   return false;
-  // }
+  incrementStarPoints() {
+    this.starPoints = this.starPoints + 1;
+  }
 
-  calcMovePosibilites() {
-    //this.reachableRegion not marked
-    //this.reachableRegion for each dice Color
-    //this.reachableRegion for each dice Value
+  getBonusPoints(): number {
+    return this.bonusPoints;
+  }
+  getColPoints(): number {
+    return this.colPoints;
+  }
+  getStarPoints(): number {
+    return this.starPoints;
+  }
+  getJokerPoints(): number {
+    return this.jokerPoints;
+  }
+  getTotalPoints(): number {
+    return (
+      this.getBonusPoints() +
+      this.getColPoints() +
+      this.getStarPoints() +
+      this.getJokerPoints()
+    );
+  }
+  getAllPoints() {
+    return {
+      bonus: this.getBonusPoints(),
+      col: this.getColPoints(),
+      star: this.getStarPoints(),
+      joker: this.getJokerPoints(),
+      total: this.getTotalPoints(),
+    };
   }
 }

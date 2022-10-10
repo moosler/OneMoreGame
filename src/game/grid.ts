@@ -296,8 +296,6 @@ export class Grid {
     for (let i = 0; i < regions.length; i++) {
       const regionIndex = regions[i];
       const region = this.regions[regionIndex];
-      console.log(region);
-
       for (let i = 0; i < region.length; i++) {
         const cell = region[i];
         // if (!cell.isX) {
