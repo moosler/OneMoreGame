@@ -191,7 +191,7 @@ export class Cell {
         this.draw();
       });
       this.gameObject.on("pointerdown", () => {
-        this.setXForPlayer();
+        gameInstance.setXForPlayer(this);
       });
     }
   }
@@ -211,18 +211,7 @@ export class Cell {
       border.show(neighbors);
     }
   }
-  setXForPlayer() {
-    gameInstance.currentPlayer.setMark(this, this.getNeighbors());
-    if (this.isPossibleMove()) {
-      this.setX();
-      if (this.isStar) {
-        gameInstance.setStarPoint();
-      }
-    }
-  }
-  isPossibleMove(): boolean {
-    return true;
-  }
+
   setX(marked = true) {
     this.isX = marked;
     this.setText("X");

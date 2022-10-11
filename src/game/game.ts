@@ -8,6 +8,7 @@ import { DiceField } from "./diceField";
 import { Button } from "./button";
 import { Player } from "./player";
 import { Random } from "./random";
+import { Cell } from "./cell";
 
 export var Rand = new Random();
 
@@ -55,6 +56,7 @@ export class Game {
   currentPlayer: Player;
   turn: number;
   tickPerTurn: number;
+  possibleMovements: number[];
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.marginLeft = 50;
@@ -68,6 +70,7 @@ export class Game {
     this.currentPlayer = this.players[0];
     this.turn = 1;
     this.tickPerTurn = 0;
+    this.possibleMovements = new Array();
     /**@todo move to UI Components */
 
     this.playerStat = this.scene.add.text(
@@ -138,7 +141,11 @@ export class Game {
     if (debug) {
       this.diceField.shuffleDices(debugShuffle);
       let cell = this.grid.grid[7][3];
-      this.players[0].setMark(cell, this.grid.getNeighbors(cell, false, false));
+      this.players[0].setMark(
+        cell,
+        this.grid.getNeighbors(cell, false, false),
+        this.turn
+      );
       let cell2 = this.grid.grid[8][3];
       this.players[0].setMark(
         cell2,
@@ -153,8 +160,8 @@ export class Game {
     this.highlightMovements();
   }
   highlightMovements() {
-    let regions = this.calcMovementForDices();
-    this.grid.highlightRegion(regions);
+    this.possibleMovements = this.calcMovementForDices();
+    this.grid.highlightRegion(this.possibleMovements);
   }
   nextStep() {
     this.nextPlayer();
@@ -290,5 +297,49 @@ export class Game {
   setStarPoint() {
     this.currentPlayer.incrementStarPoints();
     this.showPointsForPlayer();
+  }
+  shake() {
+    this.scene.cameras.main.shake(100, 0.005);
+  }
+  setXForPlayer(cell: Cell) {
+    if (!this.isPossibleMove(cell)) {
+      this.shake();
+      return;
+    }
+    this.currentPlayer.setMark(cell, cell.getNeighbors(), this.turn);
+    cell.setX();
+
+    /**
+     * @todo only set Points if next Button is clicked!!!
+     */
+    if (cell.isStar) {
+      this.setStarPoint();
+    }
+  }
+  isPossibleMove(cell: Cell): boolean {
+    /**
+     * @todo check if clicked X are the same amount for dices
+     */
+    if (
+      this.currentPlayer.isPossibleMove(cell, this.turn) &&
+      !cell.isX &&
+      this.isIsinPossibleMovements(cell)
+    ) {
+      return true;
+    }
+    return false;
+  }
+  isIsinPossibleMovements(cell: Cell): boolean {
+    for (let i = 0; i < this.possibleMovements.length; i++) {
+      const regionIndex = this.possibleMovements[i];
+      const regions = this.grid.getRegion(regionIndex);
+      for (let j = 0; j < regions.length; j++) {
+        const region = regions[j];
+        if (region.pos.x === cell.pos.x && region.pos.y === cell.pos.y) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

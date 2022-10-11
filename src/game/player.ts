@@ -1,5 +1,7 @@
 // import { Rect } from "./rect";
 import { Cell } from "./cell";
+import { gameInstance } from "../scenes/Game";
+
 export class Player {
   name: String;
   reachableRegion: { x: number; y: number }[];
@@ -10,6 +12,7 @@ export class Player {
   starPoints: number;
   jokerPoints: number;
   totalPoints: number;
+  moves: { 0: { x: number; y: number }[] } | any;
 
   constructor(
     name: String,
@@ -20,6 +23,7 @@ export class Player {
     this.index = index;
     this.reachableRegion = reachableRegion;
     this.markedRegion = [];
+    this.moves = {};
     this.bonusPoints = 0;
     this.colPoints = 0;
     this.starPoints = 0;
@@ -28,7 +32,7 @@ export class Player {
     this.init();
   }
   init() {}
-  setMark(cell: Cell, neighbors: Cell[]) {
+  setMark(cell: Cell, neighbors: Cell[], turn: number) {
     let obj = { x: cell.pos.x, y: cell.pos.y };
     //add cell to markedRegion
     this.addToArrayIfNotExist(obj, this.markedRegion);
@@ -40,6 +44,15 @@ export class Player {
       const obj = { x: neighbor.pos.x, y: neighbor.pos.y };
       this.addToArrayIfNotExist(obj, this.reachableRegion);
     }
+
+    this.addMovment(cell, turn);
+  }
+  addMovment(cell: Cell, turn: number) {
+    //add every movement to the object moves
+    if (!(turn in this.moves)) {
+      this.moves[turn] = new Array();
+    }
+    this.moves[turn].push(cell);
   }
   addToArrayIfNotExist(obj: { x: any; y: any }, arr: any[]) {
     const index = arr.findIndex(
@@ -81,5 +94,23 @@ export class Player {
       joker: this.getJokerPoints(),
       total: this.getTotalPoints(),
     };
+  }
+  isInReachableRegion(cell: Cell) {
+    for (let i = 0; i < this.reachableRegion.length; i++) {
+      const region = this.reachableRegion[i];
+      if (region.x === cell.pos.x && region.y === cell.pos.y) {
+        return true;
+      }
+    }
+    return false;
+  }
+  isInSameRegion(cell: Cell, turn: number): boolean {
+    if (!(turn in this.moves)) return true;
+    let eCell = this.moves[turn][0];
+    if (eCell.getColor() !== cell.getColor()) return false;
+    return true;
+  }
+  isPossibleMove(cell: Cell, turn: number): boolean {
+    return this.isInReachableRegion(cell) && this.isInSameRegion(cell, turn);
   }
 }
