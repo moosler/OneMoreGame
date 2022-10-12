@@ -62,8 +62,8 @@ export class Player {
       arr.push(obj);
     }
   }
-  incrementStarPoints() {
-    this.starPoints = this.starPoints + 1;
+  incrementStarPoints(val: number = 1) {
+    this.starPoints = this.starPoints + val;
   }
 
   getBonusPoints(): number {
@@ -112,5 +112,9 @@ export class Player {
   }
   isPossibleMove(cell: Cell, turn: number): boolean {
     return this.isInReachableRegion(cell) && this.isInSameRegion(cell, turn);
+  }
+  getMovesMade(turn: number) {
+    if (!(turn in this.moves)) return 0;
+    return this.moves[turn].length;
   }
 }

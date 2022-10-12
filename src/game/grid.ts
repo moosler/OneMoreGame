@@ -17,11 +17,17 @@ export class Grid {
   grid: Cell[][];
   coherentCells: Cell[];
   regions: Cell[][];
-  constructor(scene: Phaser.Scene, mLeft: number, mTop: number) {
+  constructor(
+    scene: Phaser.Scene,
+    mLeft: number,
+    mTop: number,
+    cols: number = 15,
+    rows: number = 7
+  ) {
     this.scene = scene;
     this.group = this.scene.physics.add.staticGroup();
-    this.cols = 15;
-    this.rows = 7;
+    this.cols = cols;
+    this.rows = rows;
     this.rectSize = 40;
     this.marginLeft = mLeft;
     this.marginTop = mTop;

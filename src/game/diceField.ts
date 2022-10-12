@@ -58,7 +58,7 @@ export class DiceField {
       x += this.rectSize;
     }
   }
-  getDiceValues() {
+  getDiceValues(): number[] {
     let colAr = [];
     let mid = 3;
     for (let i = 0; i < mid; i++) {
@@ -68,9 +68,9 @@ export class DiceField {
         if (val == "?") {
           let nArr = [...diceValues];
           nArr.pop();
-          return nArr;
+          return nArr.map(Number);
         }
-        colAr.push(val);
+        colAr.push(parseInt(val));
       }
     }
     let unique = colAr.filter(function onlyUnique(value, index, self) {
@@ -97,6 +97,22 @@ export class DiceField {
       return self.indexOf(value) === index;
     });
     return unique;
+  }
+
+  // isInRange(no: number) {
+  //   let values = this.getDiceValues();
+  //   const min = Math.min(...values);
+  //   const max = Math.max(...values);
+  //   return no <= max && no >= min;
+  // }
+  matchesValue(no: number) {
+    let values = this.getDiceValues();
+    return values.includes(no);
+  }
+  isSmallerThen(no: number) {
+    let values = this.getDiceValues();
+    const max = Math.max(...values);
+    return no <= max;
   }
   shuffleDices(arr: string[] | null = null) {
     for (let i = 0; i < this.dices.length; i++) {

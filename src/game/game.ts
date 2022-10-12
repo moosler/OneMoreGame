@@ -39,6 +39,16 @@ export const rectColors = [
   { r: 88, g: 133, b: 62 }, //green #58853e // 5801278
 ];
 
+/**
+ * Game Settings
+ */
+export const defaultConfig = {
+  cols: 15,
+  rows: 7,
+  // starsForEachColor: 1 // current = one for each color */,
+  // jokers: 8 // current = half of cols */,
+};
+
 export class Game {
   scene: Phaser.Scene;
   grid: Grid;
@@ -61,7 +71,13 @@ export class Game {
     this.scene = scene;
     this.marginLeft = 50;
     this.marginTop = 50;
-    this.grid = new Grid(this.scene, this.marginLeft, this.marginTop + 50);
+    this.grid = new Grid(
+      this.scene,
+      this.marginLeft,
+      this.marginTop + 50,
+      defaultConfig.cols,
+      defaultConfig.rows
+    );
     this.players = [
       new Player("One", 0, this.grid.calcReachableRegion()),
       new Player("Two", 1, this.grid.calcReachableRegion()),
@@ -164,6 +180,11 @@ export class Game {
     this.grid.highlightRegion(this.possibleMovements);
   }
   nextStep() {
+    if (!this.isValidMove()) {
+      this.shake();
+      return;
+    }
+    this.setPointsForPlayer();
     this.nextPlayer();
     /**
      * @todo remove debug
@@ -294,9 +315,20 @@ export class Game {
     this.pointsCol.starPoints?.setText(points["star"]);
     this.pointsCol.totalPoints?.setText(points["total"]);
   }
-  setStarPoint() {
-    this.currentPlayer.incrementStarPoints();
-    this.showPointsForPlayer();
+  setPointsForPlayer() {
+    let starPoints = 0;
+    for (let i = 0; i < this.currentPlayer.moves[this.turn].length; i++) {
+      const cell = this.currentPlayer.moves[this.turn][i];
+      if (cell.isStar) {
+        starPoints++;
+      }
+    }
+    this.currentPlayer.incrementStarPoints(starPoints);
+    /**
+     * @todo check column points
+     * @todo check bonus color points
+     * @todo used joker points
+     */
   }
   shake() {
     this.scene.cameras.main.shake(100, 0.005);
@@ -308,22 +340,14 @@ export class Game {
     }
     this.currentPlayer.setMark(cell, cell.getNeighbors(), this.turn);
     cell.setX();
-
-    /**
-     * @todo only set Points if next Button is clicked!!!
-     */
-    if (cell.isStar) {
-      this.setStarPoint();
-    }
   }
   isPossibleMove(cell: Cell): boolean {
-    /**
-     * @todo check if clicked X are the same amount for dices
-     */
+    let movesMade = this.currentPlayer.getMovesMade(this.turn);
     if (
       this.currentPlayer.isPossibleMove(cell, this.turn) &&
       !cell.isX &&
-      this.isIsinPossibleMovements(cell)
+      this.isIsinPossibleMovements(cell) &&
+      this.diceField.isSmallerThen(movesMade + 1)
     ) {
       return true;
     }
@@ -341,5 +365,9 @@ export class Game {
       }
     }
     return false;
+  }
+  isValidMove() {
+    let movesMade = this.currentPlayer.getMovesMade(this.turn);
+    return this.diceField.matchesValue(movesMade);
   }
 }
