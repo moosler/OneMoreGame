@@ -49,17 +49,18 @@ export class Grid {
         //Math.random();
         let randColor =
           rectColors[Math.floor(Rand.random() * rectColors.length)];
-        const color = new Phaser.Display.Color(
-          randColor.r,
-          randColor.g,
-          randColor.b
-        );
+        let color = Phaser.Display.Color.HexStringToColor(randColor).color;
+        // const color = new Phaser.Display.Color(
+        //   randColor.r,
+        //   randColor.g,
+        //   randColor.b
+        // );
         let y =
           j * (this.rectSize + this.strokWeigth) +
           this.marginTop +
           this.rectSize / 2;
         let style = {
-          fill: color.color,
+          fill: color,
         };
         // console.log(style);
 
@@ -92,8 +93,11 @@ export class Grid {
     let rowArr: number[] = [];
     for (let i = 0; i < rectColors.length; i++) {
       const element = rectColors[i];
-      const color = new Phaser.Display.Color(element.r, element.g, element.b);
-      rowArr.push(color.color);
+      // const color = new Phaser.Display.Color(element.r, element.g, element.b);
+      const color = Phaser.Display.Color.HexStringToColor(element).color;
+
+      // rowArr.push(color.color);
+      rowArr.push(color);
     }
 
     for (let i = 0; i < dif; i++) {
@@ -111,17 +115,18 @@ export class Grid {
     for (const key in rectColors) {
       if (Object.prototype.hasOwnProperty.call(rectColors, key)) {
         const element = rectColors[key];
-        const color = new Phaser.Display.Color(element.r, element.g, element.b);
+        // const color = new Phaser.Display.Color(element.r, element.g, element.b);
+        const color = Phaser.Display.Color.HexStringToColor(element).color;
         this.setStar(color);
       }
     }
   }
-  setStar(color: Phaser.Display.Color) {
+  setStar(color: number) {
     let cell =
       this.grid[Math.floor(Rand.random() * this.cols)][
         Math.floor(Rand.random() * this.rows)
       ];
-    while (cell.style.fill !== color.color) {
+    while (cell.style.fill !== color) {
       let randX = Math.floor(Rand.random() * this.cols);
       let randY = Math.floor(Rand.random() * this.rows);
       cell = this.grid[randX][randY];

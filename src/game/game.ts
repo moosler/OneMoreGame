@@ -21,22 +21,12 @@ var debug = false;
 let debugShuffle = ["3", "5", "5", "#c66a8d", "#58853e", "#c8b47f"];
 /** */
 
-/**
- * @todo use hex Colors
-let diceColors = ["#62b1db", "#c66a8d", "#ae7749", "#c8b47f", "#58853e", "#111111"];
- * 
- */
-// Blue #24287B
-// red #DD292B
-// orange #EF7D36
-// yellow #E6DC3F
-// green #44A043
 export const rectColors = [
-  { r: 98, g: 177, b: 219 }, //blue #62b1db //6468059 #24287B
-  { r: 198, g: 106, b: 141 }, //red #c66a8d //13003405
-  { r: 174, g: 119, b: 73 }, //orange #ae7749 // 11433801
-  { r: 200, g: 180, b: 127 }, //yellow #c8b47f //13153407
-  { r: 88, g: 133, b: 62 }, //green #58853e // 5801278
+  "#62b1db", //blue #62b1db //6468059 #24287B
+  "#c66a8d", //red #c66a8d //13003405
+  "#ae7749", //orange #ae7749 // 11433801
+  "#c8b47f", //yellow #c8b47f //13153407
+  "#58853e", //green #58853e // 5801278
 ];
 
 /**

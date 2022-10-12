@@ -37,14 +37,16 @@ export class PointsCol {
   }
   init() {
     for (let i = 0; i < rectColors.length; i++) {
-      const color = new Phaser.Display.Color(
-        rectColors[i].r,
-        rectColors[i].g,
-        rectColors[i].b
-      );
+      let color = Phaser.Display.Color.HexStringToColor(rectColors[i]).color;
+
+      // const color = new Phaser.Display.Color(
+      //   rectColors[i].r,
+      //   rectColors[i].g,
+      //   rectColors[i].b
+      // );
 
       let style = {
-        fill: color.color,
+        fill: color,
       };
       let y = i * (this.rectSize + this.strokWeigth) + this.y;
       this.elements[0] = new Array(rectColors.length);
