@@ -87,7 +87,6 @@ export class Cell {
       ...styleDefaultRect,
       ...style,
     };
-    // console.log(this.style);
 
     this.gameObject = new Phaser.GameObjects.Rectangle(
       this.scene,

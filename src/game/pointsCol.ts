@@ -4,7 +4,7 @@ import { rectColors } from "./game";
 
 import { PointsField } from "./pointsField";
 
-export class PointsCol {
+export class PointsColor {
   scene: Phaser.Scene;
   x: number;
   y: number;
@@ -36,6 +36,9 @@ export class PointsCol {
     this.init();
   }
   init() {
+    this.elements[0] = new Array(rectColors.length);
+    this.elements[1] = new Array(rectColors.length);
+
     for (let i = 0; i < rectColors.length; i++) {
       let color = Phaser.Display.Color.HexStringToColor(rectColors[i]).color;
 
@@ -49,7 +52,6 @@ export class PointsCol {
         fill: color,
       };
       let y = i * (this.rectSize + this.strokWeigth) + this.y;
-      this.elements[0] = new Array(rectColors.length);
       this.elements[0][i] = new Rect(
         this.scene,
         this.x,
@@ -61,7 +63,6 @@ export class PointsCol {
       );
       this.group.add(this.elements[0][i].gameObject, true);
       let x = this.x + (this.rectSize + this.strokWeigth);
-      this.elements[1] = new Array(rectColors.length);
       this.elements[1][i] = new Rect(
         this.scene,
         x,
@@ -108,7 +109,8 @@ export class PointsCol {
         rectColors.length * (this.rectSize + this.strokWeigth) +
         ++j * (this.rectSize * 0.5 + this.strokWeigth * 2),
       "Star:",
-      this.rectSize
+      this.rectSize,
+      -4
     );
     this.totalPoints = new PointsField(
       this.scene,
@@ -119,5 +121,28 @@ export class PointsCol {
       "Total:",
       this.rectSize
     );
+  }
+  getPointForColor(column: number) {
+    let leftElement = this.elements[0][column];
+    let rightElement = this.elements[1][column];
+    let point = parseInt(leftElement.getText());
+    if (!leftElement.getHightlight()) {
+      point = parseInt(rightElement.getText());
+    }
+    return point;
+  }
+  highlight(colArray: any[]) {
+    for (let i = 0; i < colArray.length; i++) {
+      const left_right = colArray[i];
+      for (let j = 0; j < left_right.length; j++) {
+        const element = left_right[j];
+        if (element) {
+          this.elements[i][j].setHighlight();
+        }
+        if (element === false) {
+          this.elements[i][j].setNotAvailable();
+        }
+      }
+    }
   }
 }

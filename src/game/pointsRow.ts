@@ -20,10 +20,13 @@ export class PointsRow {
     this.cols = cols;
     this.rectSize = 40;
     this.strokWeigth = 2;
-    this.elements = new Array(2);
+    this.elements = [...Array(2)].map((_) => Array(this.cols).fill({}));
     this.init();
   }
   init() {
+    this.elements[0] = new Array(this.cols);
+    this.elements[1] = new Array(this.cols);
+
     for (let i = 0; i < this.cols; i++) {
       let style = {
         fill: 0xffffff,
@@ -44,9 +47,9 @@ export class PointsRow {
       }
 
       //Top
-      this.elements[0] = new Array(this.cols);
       let x =
         i * (this.rectSize + this.strokWeigth) + this.x + this.rectSize / 2;
+
       this.elements[0][i] = new Rect(
         this.scene,
         x,
@@ -57,9 +60,7 @@ export class PointsRow {
         String(textTop)
       );
       this.group.add(this.elements[0][i].gameObject, true);
-
       //Bottom
-      this.elements[1] = new Array(this.cols);
       this.elements[1][i] = new Rect(
         this.scene,
         x,
@@ -70,6 +71,31 @@ export class PointsRow {
         String(textBot)
       );
       this.group.add(this.elements[1][i].gameObject, true);
+    }
+  }
+  getPointForColumn(column: number) {
+    let topElement = this.elements[0][column];
+    let bottomElement = this.elements[1][column];
+    let point = parseInt(topElement.getText());
+    if (topElement.getHightlight() === false) {
+      point = parseInt(bottomElement.getText());
+    }
+    console.log(point);
+
+    return point;
+  }
+  highlight(colArray: any[]) {
+    for (let i = 0; i < colArray.length; i++) {
+      const top_bottom = colArray[i];
+      for (let j = 0; j < top_bottom.length; j++) {
+        const element = top_bottom[j];
+        if (element) {
+          this.elements[i][j].setHighlight();
+        }
+        if (element === false) {
+          this.elements[i][j].setNotAvailable();
+        }
+      }
     }
   }
 }

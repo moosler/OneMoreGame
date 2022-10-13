@@ -9,19 +9,22 @@ export class PointsField {
   textElement: Phaser.GameObjects.Text;
   textElementPoint: Phaser.GameObjects.Text;
   style: { font: string; fill: string };
+  initPointVal: number;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
     text: string,
-    rectSize: number
+    rectSize: number,
+    startpoint: number = 0
   ) {
     this.scene = scene;
     this.x = x;
     this.y = y;
     this.text = text;
     this.rectSize = rectSize;
+    this.initPointVal = startpoint;
     this.style = {
       font: this.rectSize * 0.5 + "px Arial Black",
       fill: "#f8f3ff",
@@ -35,7 +38,7 @@ export class PointsField {
     this.textElementPoint = this.scene.add.text(
       this.x + this.textElement.width,
       this.y,
-      String(0),
+      String(this.initPointVal),
       this.style
     );
     this.init();

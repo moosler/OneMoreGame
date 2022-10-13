@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser, { Tilemaps } from "phaser";
 
 export let styleNonInteractiveRect = {
   fill: 0xff0000,
@@ -37,6 +37,10 @@ export let styleNonInteractiveRect = {
     strokeColor: 0xc3c3c3,
     strokeWeigth: 4,
   },
+  notAvailable: {
+    strokeColor: 0xffffff,
+    strokeWeigth: 4,
+  },
 };
 
 export class Rect {
@@ -56,6 +60,7 @@ export class Rect {
     alpha: number;
     strokeWeigth: number;
     highlight: any;
+    notAvailable: any;
     hover: any;
   };
   gameObject: Phaser.GameObjects.Rectangle;
@@ -65,6 +70,7 @@ export class Rect {
   highlight: boolean;
   isHovered: boolean;
   highlightPermanent: boolean;
+  notAvailable: boolean;
 
   constructor(
     scene: Phaser.Scene,
@@ -109,7 +115,8 @@ export class Rect {
         color: this.style.font.fill,
       }
     );
-    this.highlight = false; //highlight region
+    this.highlight = false; //you got this
+    this.notAvailable = false; //you cannot reacht this
     this.isHovered = false;
     this.init();
   }
@@ -154,22 +161,45 @@ export class Rect {
     this.gameObject.setFillStyle(this.style.fill, this.style.alpha);
     let strokeColor = this.style.strokeColor;
     let strokeWeight = this.style.strokeWeigth;
-    if (this.highlight) {
-      strokeColor = this.style.highlight.strokeColor;
-      strokeWeight = this.style.highlight.strokeWeigth;
-    }
+
     if (this.highlightPermanent) {
       strokeColor = this.style.highlightPermanent.strokeColor;
       strokeWeight = this.style.highlightPermanent.strokeWeigth;
     }
+    /**@todo set Alpha */
+    if (this.notAvailable) {
+      strokeColor = this.style.notAvailable.strokeColor;
+      strokeWeight = this.style.notAvailable.strokeWeigth;
+    }
+    if (this.highlight) {
+      strokeColor = this.style.highlight.strokeColor;
+      strokeWeight = this.style.highlight.strokeWeigth;
+    }
+
     if (this.isHovered) {
       strokeColor = this.style.hover.strokeColor;
       strokeWeight = this.style.hover.strokeWeigth;
     }
     this.gameObject.setStrokeStyle(strokeWeight, strokeColor);
   }
+  setHighlight() {
+    this.highlight = true;
+    this.notAvailable = false;
+    this.draw();
+  }
+  setNotAvailable() {
+    this.highlight = false;
+    this.notAvailable = true;
+    this.draw();
+  }
+  getHightlight() {
+    return this.highlight;
+  }
   draw() {
     this.setRectStyle();
     this.setTextStyle();
+  }
+  getText() {
+    return this.text;
   }
 }

@@ -23,7 +23,7 @@ export class JokerRow {
     this.init();
   }
   init() {
-    for (let i = 0; i < this.cols / 2; i++) {
+    for (let i = 0; i < this.cols; i++) {
       let style = {
         fill: 0xffffff,
       };

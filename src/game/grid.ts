@@ -1,8 +1,6 @@
 import Phaser from "phaser";
-import { Rect } from "./rect";
 import { Cell } from "./cell";
 import { rectColors, Rand } from "./game";
-// import { styleDefaultRect } from "./game";
 
 export class Grid {
   group: Phaser.Physics.Arcade.StaticGroup;
@@ -17,12 +15,15 @@ export class Grid {
   grid: Cell[][];
   coherentCells: Cell[];
   regions: Cell[][];
+  colorsCount: { [k: string]: any };
+  starsForEachColor: number;
   constructor(
     scene: Phaser.Scene,
     mLeft: number,
     mTop: number,
     cols: number = 15,
-    rows: number = 7
+    rows: number = 7,
+    starsForEachColor: number = 1
   ) {
     this.scene = scene;
     this.group = this.scene.physics.add.staticGroup();
@@ -35,9 +36,25 @@ export class Grid {
     this.grid = new Array(this.cols);
     this.regions = [];
     this.coherentCells = []; //???
+    this.colorsCount = {};
+    this.starsForEachColor = starsForEachColor;
     this.init();
   }
   init() {
+    this.initColorsCount();
+    this.createCells();
+    this.setStartCol();
+    this.setStars();
+    this.calcContiguousRegions();
+  }
+
+  initColorsCount() {
+    for (let i = 0; i < rectColors.length; i++) {
+      const color = rectColors[i];
+      this.colorsCount[color] = 0;
+    }
+  }
+  createCells() {
     for (let i = 0; i < this.cols; i++) {
       let isMid = Math.floor(this.cols / 2) == i;
       this.grid[i] = new Array(this.rows);
@@ -50,11 +67,6 @@ export class Grid {
         let randColor =
           rectColors[Math.floor(Rand.random() * rectColors.length)];
         let color = Phaser.Display.Color.HexStringToColor(randColor).color;
-        // const color = new Phaser.Display.Color(
-        //   randColor.r,
-        //   randColor.g,
-        //   randColor.b
-        // );
         let y =
           j * (this.rectSize + this.strokWeigth) +
           this.marginTop +
@@ -62,7 +74,8 @@ export class Grid {
         let style = {
           fill: color,
         };
-        // console.log(style);
+
+        this.colorsCount[randColor]++;
 
         this.grid[i][j] = new Cell(
           this.scene,
@@ -78,12 +91,7 @@ export class Grid {
         this.group.add(this.grid[i][j].gameObject, true);
       }
     }
-    this.setStartCol();
-    this.setStars();
-    this.calcContiguousRegions();
-    // console.log(this.regions);
   }
-
   /**
    * makes sure that all colors appear at least once in the middle column
    */
@@ -112,12 +120,14 @@ export class Grid {
     }
   }
   setStars() {
-    for (const key in rectColors) {
-      if (Object.prototype.hasOwnProperty.call(rectColors, key)) {
-        const element = rectColors[key];
-        // const color = new Phaser.Display.Color(element.r, element.g, element.b);
-        const color = Phaser.Display.Color.HexStringToColor(element).color;
-        this.setStar(color);
+    for (let i = 0; i < this.starsForEachColor; i++) {
+      for (const key in rectColors) {
+        if (Object.prototype.hasOwnProperty.call(rectColors, key)) {
+          const element = rectColors[key];
+          // const color = new Phaser.Display.Color(element.r, element.g, element.b);
+          const color = Phaser.Display.Color.HexStringToColor(element).color;
+          this.setStar(color);
+        }
       }
     }
   }
@@ -214,8 +224,6 @@ export class Grid {
     selfInclude: boolean = true,
     onlySameColor = true
   ): Cell[] {
-    // console.log(cell);
-
     let neighbors = [];
     if (selfInclude) neighbors.push(cell);
     if (this.isCellinGrid(cell.pos.x + 1, cell.pos.y)) {
